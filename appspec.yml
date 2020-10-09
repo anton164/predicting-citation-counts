@@ -2,7 +2,7 @@ version: 0.0
 os: linux
 files:
   - source: /
-    destination: /home/ubuntu/aws-codedeploy
+    destination: /home/ubuntu/aml-streamlit
 permissions:
   - object: /home/ubuntu
     owner: ubuntu
