@@ -1,3 +1,3 @@
 #!/bin/bash
 cd ~/aml-streamlit
-pm2 startOrReload ecosystem.config.js 
+/home/ubuntu/miniconda/bin/streamlit run explore.py &

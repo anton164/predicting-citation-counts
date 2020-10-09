@@ -1,10 +1,10 @@
 module.exports = {
     apps: [
         {
-            name: 'aws-codedeploy',
-            script: 'streamlit',
-            args: 'run explore.py',
-            interpreter: 'none',
+            name: 'aml-streamlit',
+            script: 'explore.py',
+            args: 'run',
+            interpreter: 'streamlit',
             env: {
                 NODE_ENV: 'development',
             },
