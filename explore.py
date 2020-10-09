@@ -7,7 +7,7 @@ st.header("Exploring the dataset")
 
 @st.cache
 def load_data():
-    return pd.read_json("./250k.docs.jsonl", lines=True)
+    return pd.read_json("./sample_data.jsonl", lines=True)
 
 raw_docs = load_data()
 
