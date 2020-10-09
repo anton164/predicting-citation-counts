@@ -134,3 +134,4 @@ dmypy.json
 
 # Datasets
 250k.docs.jsonl
+mag5.docs.jsonl

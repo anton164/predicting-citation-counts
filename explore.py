@@ -5,8 +5,12 @@ import streamlit as st
 
 st.header("Exploring the dataset")
 
-raw_docs = pd.read_json("./sample_data.jsonl", lines=True)
+@st.cache
+def load_data():
+    return pd.read_json("./250k.docs.jsonl", lines=True)
 
-st.write(raw_docs)
+raw_docs = load_data()
+
+st.write(raw_docs.head(10))
 
 st.write(raw_docs.describe())
