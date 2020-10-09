@@ -4,34 +4,14 @@ on:
   push:
     branches:
       - main
-      - staging
-  pull_request:
-    branches:
-      - main
-      - staging
 
 jobs:
   buildAndTest:
     name: CI Pipeline
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: ['12.x']
 
     steps:
       - uses: actions/checkout@v2
-
-      # # Initialize Node.js
-      # - name: Install Node.js ${{ matrix.node-version }}
-      #   uses: actions/setup-node@v1
-      #   with:
-      #     node-version: ${{ matrix.node-version }}
-
-      # # Install project dependencies, test and build
-      # - name: Install dependencies
-      #   run: npm install
-      # - name: Run build
-      #   run: npm run build
 
   deploy:
     name: CD Pipeline
@@ -39,7 +19,6 @@ jobs:
     strategy:
       matrix:
         python-version: [3.8]
-        node-version: ['12.x']
         appname: ['aml-streamlit']
         deploy-group: ['staging']
         s3-bucket: ['aml-aws-codedeploy-deployments']
