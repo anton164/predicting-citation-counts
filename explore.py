@@ -1,13 +1,19 @@
 import json
 import pandas as pd
 import streamlit as st
+import os
 
 st.header("Data Exploration")
 
+# Enables streamlit to read data from mounted disk in GCP
+dataset_location = "./"
+if "STREAMLIT_DATA_LOCATION" in os.environ:
+    dataset_location = os.environ["STREAMLIT_DATA_LOCATION"]
+
 datasets = {
-    "./sample_data.jsonl": "Small sample (50 rows)",
-    "./250k.docs.jsonl": "Large sample (250k rows)",
-    "./mag5.docs.jsonl": "Full dataset (5m rows, slooow)",
+    dataset_location + "sample_data.jsonl": "Small sample (50 rows)",
+    dataset_location + "250k.docs.jsonl": "Large sample (250k rows)",
+    dataset_location + "mag5.docs.jsonl": "Full dataset (5m rows, slooow)",
 }
 
 selected_dataset = st.selectbox(
@@ -16,7 +22,7 @@ selected_dataset = st.selectbox(
     format_func=lambda x: datasets[x],
 )
 
-docs_limit = st.slider("Maximum number of docs to parse", 10, 1000, step=50)
+docs_limit = st.slider("Maximum number of docs to parse", 10, 10000, step=50)
 
 
 loading_bar = st.progress(0)
