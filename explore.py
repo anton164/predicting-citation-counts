@@ -2,6 +2,7 @@ import json
 import pandas as pd
 import streamlit as st
 import os
+import time
 
 st.header("Data Exploration")
 
@@ -22,14 +23,19 @@ selected_dataset = st.selectbox(
     format_func=lambda x: datasets[x],
 )
 
-docs_limit = st.slider("Maximum number of docs to parse", 10, 10000, step=50)
+docs_limit = st.number_input(
+    "Max limit of docs to parse (more than 10000 items will be slow)",
+    value=1000,
+    step=50,
+)
 
 
 loading_bar = st.progress(0)
 
 
-@st.cache(suppress_st_warning=True)
+# @st.cache(suppress_st_warning=True)
 def load_dataset(dataset_filename, limit):
+    start_time = time.perf_counter()
     json_data = []
     i = 0
     print("Loading dataset")
@@ -37,10 +43,9 @@ def load_dataset(dataset_filename, limit):
         for json_line in file:
             doc = json.loads(json_line)
 
-            # Count authors by their id (for now we don't care about AuthorName and SequenceNumber)
-            for author in doc["Authors"]:
-                doc["AuthorId_" + str(author["AuthorId"])] = 1
-
+            # Extract author id (we don't care about AuthorName and SequenceNumber for now)
+            for k, author in enumerate(doc["Authors"]):
+                doc["Author_" + str(k + 1)] = author["AuthorId"]
             del doc["Authors"]
 
             # Map fields of study
@@ -82,6 +87,11 @@ def load_dataset(dataset_filename, limit):
     df = pd.DataFrame(json_data)
     print("Created DataFrame")
 
+    print("One-hot encoding authors")
+    author_cols = [col for col in df if col.startswith("Author_")]
+    df = pd.get_dummies(df, columns=author_cols, sparse=True, prefix="Author")
+    print("Finished one-hot encoding")
+    print("Took " + str(time.perf_counter() - start_time) + "s   to load the dataset")
     return df
 
 
@@ -91,5 +101,10 @@ loading_bar.empty()
 st.subheader("Data shape")
 raw_docs.shape
 
-st.subheader("First 10 rows")
-st.write(raw_docs.head(10))
+# Only show titles if the data has a lot  dimensions
+if raw_docs.shape[0] * raw_docs.shape[1] > 10000:
+    st.subheader("First 10 papers")
+    st.write(raw_docs.head(10)["Title"])
+else:
+    st.subheader("First 10 rows")
+    st.write(raw_docs.head(10))
