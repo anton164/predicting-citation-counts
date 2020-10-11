@@ -33,7 +33,7 @@ docs_limit = st.number_input(
 loading_bar = st.progress(0)
 
 
-# @st.cache(suppress_st_warning=True)
+@st.cache(suppress_st_warning=True)
 def load_dataset(dataset_filename, limit):
     start_time = time.perf_counter()
     json_data = []
