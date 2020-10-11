@@ -15,7 +15,6 @@ pip install -r requirements.txt
 - [anton/main branch (GCP)](http://35.184.151.238/)
 - [jan/main branch (GCP)](http://35.188.114.198/)
 - [eli/main branch (GCP)](http://35.184.94.57/)
-- [AWS EC2 (main branch)](http://54.227.37.124:8501/)
 
 ## Run locally
 ```
