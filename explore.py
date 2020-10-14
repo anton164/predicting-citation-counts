@@ -1,12 +1,9 @@
 import json
 import pandas as pd
 import streamlit as st
-<<<<<<< HEAD
 import os
 import time
-=======
 import matplotlib.pyplot as plt
->>>>>>> My data analysis
 
 st.header("Data Exploration")
 
