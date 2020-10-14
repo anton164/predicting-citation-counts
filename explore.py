@@ -2,8 +2,7 @@ import json
 import pandas as pd
 import streamlit as st
 import os
-import time
-import matplotlib.pyplot as plt
+from utils import time_it
 
 st.header("Data Exploration")
 
@@ -36,7 +35,6 @@ loading_bar = st.progress(0)
 
 @st.cache(suppress_st_warning=True)
 def load_dataset(dataset_filename, limit):
-    start_time = time.perf_counter()
     json_data = []
     i = 0
     print("Loading dataset")
@@ -85,29 +83,37 @@ def load_dataset(dataset_filename, limit):
     dataframe_loader = st.spinner("Loading dataframe")
     df = pd.DataFrame(json_data)
     print("Created DataFrame")
+    return df
 
-    print("One-hot encoding authors")
+
+def one_hot_encode_authors(df):
     author_cols = [col for col in df if col.startswith("Author_")]
     df = pd.get_dummies(df, columns=author_cols, sparse=True, prefix="Author")
-    print("Finished one-hot encoding")
-    print("Took " + str(time.perf_counter() - start_time) + "s   to load the dataset")
     return df
+
+
+# Wrap methods with timer:
+load_dataset = time_it(
+    lambda df: "Loading dataset ({} docs)".format((len(df))),
+    load_dataset,
+)
+one_hot_encode_authors = time_it("One-hot encoding authors", one_hot_encode_authors)
 
 
 raw_docs = load_dataset(selected_dataset, docs_limit)
 loading_bar.empty()
 
-st.subheader("Data shape")
+st.subheader("Raw docs shape")
 raw_docs.shape
 
-# Only show titles if the data has a lot  dimensions
-if raw_docs.shape[0] * raw_docs.shape[1] > 10000:
-    st.subheader("First 10 papers")
-    st.write(raw_docs.head(10)["Title"])
-else:
-    st.subheader("First 10 rows")
-    st.write(raw_docs.head(10))
-
+st.subheader("First 10 papers")
+st.write(raw_docs.head(10))
 
 from correlation_study import run_correlation_study
+
 run_correlation_study(raw_docs)
+
+
+one_hot_encoded = one_hot_encode_authors(raw_docs)
+st.subheader("One-hot-encoded authors shape")
+one_hot_encoded.shape
