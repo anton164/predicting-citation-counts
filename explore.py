@@ -2,6 +2,7 @@ import json
 import pandas as pd
 import streamlit as st
 import os
+import plotly.express as px
 from utils import time_it
 
 st.header("Data Exploration")
@@ -113,7 +114,38 @@ from correlation_study import run_correlation_study
 
 run_correlation_study(raw_docs)
 
+st.markdown(
+    """
+    ## Distribution of papers
+    """
+)
 
-one_hot_encoded = one_hot_encode_authors(raw_docs)
-st.subheader("One-hot-encoded authors shape")
-one_hot_encoded.shape
+st.markdown(
+    """
+    ### Rank
+    """
+)
+f = px.histogram(raw_docs, x="Rank", title="Rank distribution", nbins=50)
+f.update_yaxes(title="Count")
+st.plotly_chart(f)
+
+st.markdown(
+    """
+    ### Field of study
+    """
+)
+
+# f = px.bar(raw_docs, x="FieldOfStudy_0")
+# st.plotly_chart(f)
+
+
+st.markdown(
+    """
+    ## One-hot encoding authors
+    **Warning:** This is slow on large datasets
+    """
+)
+if st.button("Run one-hot encoding"):
+    one_hot_encoded = one_hot_encode_authors(raw_docs)
+    st.subheader("One-hot-encoded authors shape")
+    one_hot_encoded.shape
