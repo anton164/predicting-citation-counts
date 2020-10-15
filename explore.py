@@ -1,7 +1,13 @@
 import pandas as pd
 import streamlit as st
 import plotly.express as px
-from utils import time_it, one_hot_encode_authors, st_dataset_selector, load_dataset
+from utils import (
+    time_it,
+    one_hot_encode_authors,
+    st_dataset_selector,
+    load_dataset,
+    detect_language,
+)
 
 st.header("Data Exploration")
 # Wrap methods with timer:
@@ -10,6 +16,7 @@ load_dataset = time_it(
     load_dataset,
 )
 one_hot_encode_authors = time_it("One-hot encoding authors", one_hot_encode_authors)
+detect_language = time_it("Detecting language", detect_language)
 
 docs_limit = st.number_input(
     "Max limit of docs to parse (more than 10000 items will be slow)",
@@ -42,14 +49,56 @@ st.markdown(
     """
 )
 f = px.histogram(raw_docs, x="Rank", title="Rank distribution", nbins=50)
-f.update_yaxes(title="Count")
+f.update_yaxes(title="Number of papers")
 st.plotly_chart(f)
+
 
 st.markdown(
     """
     ### Field of study
     """
 )
+with st.echo():
+    grouped_by_field_of_study = (
+        raw_docs.groupby(["FieldOfStudy_0"])
+        .size()
+        .reset_index(name="countPapers")
+        .sort_values("countPapers", ascending=False)
+    ).set_index("FieldOfStudy_0")
+
+    grouped_by_field_of_study["Percentage"] = (
+        100
+        * grouped_by_field_of_study["countPapers"]
+        / grouped_by_field_of_study["countPapers"].sum()
+    )
+
+st.subheader("Field of Study (0) Distribution")
+st.table(grouped_by_field_of_study[:10])
+
+st.markdown(
+    """
+    ### Language detection
+    """
+)
+with st.echo():
+    language_column = detect_language(raw_docs["Abstract"])
+    raw_docs_with_language = raw_docs.assign(Language=language_column)
+
+    grouped_by_language = (
+        raw_docs_with_language.groupby(["Language"])
+        .size()
+        .reset_index(name="countPapers")
+        .sort_values("countPapers", ascending=False)
+    ).set_index("Language")
+
+    grouped_by_language["Percentage"] = (
+        100
+        * grouped_by_language["countPapers"]
+        / grouped_by_language["countPapers"].sum()
+    )
+
+st.subheader("Top 10 languages in the dataset")
+st.table(grouped_by_language[:10])
 
 
 st.markdown(

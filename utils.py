@@ -3,6 +3,8 @@ import streamlit as st
 import pandas as pd
 import os
 import json
+import pycld2 as cld2
+import regex
 
 
 def time_it(label, fn):
@@ -50,6 +52,18 @@ def st_dataset_selector():
     )
 
 
+RE_BAD_CHARS = regex.compile(r"\p{Cc}|\p{Cs}")
+
+
+# Due to https://github.com/mikemccand/chromium-compact-language-detector/issues/22
+# cld2 can't handle unprintable characters
+def strip_unprintable(s):
+    """
+    Strip non-printable characters
+    """
+    return "".join(c for c in s if c.isprintable())
+
+
 @st.cache(suppress_st_warning=True)
 def load_dataset(dataset_filename, limit):
     loading_bar = st.progress(0)
@@ -59,6 +73,8 @@ def load_dataset(dataset_filename, limit):
     with open(dataset_filename) as file:
         for json_line in file:
             doc = json.loads(json_line)
+
+            doc["Abstract"] = strip_unprintable(doc["Abstract"])
 
             # Extract author id (we don't care about AuthorName and SequenceNumber for now)
             for k, author in enumerate(doc["Authors"]):
@@ -105,3 +121,23 @@ def load_dataset(dataset_filename, limit):
 
     loading_bar.empty()
     return df
+
+
+def cld2_detect_language(text):
+    """
+    Detect language of text using cld2
+    See https://pypi.org/project/pycld2/ for an example
+    """
+    try:
+        isReliable, textBytesFound, details = cld2.detect(text)
+    except:
+        st.header("Failed to detect language for:")
+        st.write(text)
+        raise
+
+    return details[0]
+
+
+@st.cache
+def detect_language(df_column):
+    return df_column.apply(lambda x: cld2_detect_language(x)[0])
