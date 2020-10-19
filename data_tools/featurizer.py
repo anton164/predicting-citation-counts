@@ -15,6 +15,9 @@ from sklearn.preprocessing import LabelEncoder
 
 
 def encode_categorical(df, cols):
+    """
+    NOTE: Only works for "Small sample (50 rows) for now"
+    """
     t = df.copy().dropna(subset=cols)
     global le
     for col in cols:
@@ -26,7 +29,7 @@ def encode_categorical(df, cols):
 
 def decode_categorical(df, cols):
     """
-    NOTE: There is currently some issue with this function
+    NOTE: Only works for "Small sample (50 rows) for now"
     """
     t = df.copy()
     global le
