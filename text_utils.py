@@ -30,7 +30,15 @@ def preprocess_text(text):
 
 
 def preprocess_text_col(text_col):
-    return text_col.apply(lambda x: preprocess_text(x))
+    preproc_pipe = []
+    for doc in nlp.pipe(
+        text_col,
+        batch_size=20,
+        disable=["tagger", "parser", "entity", "ner", "textcat"],
+    ):
+        tokens = [token.lemma_ for token in doc if include_token(token)]
+        preproc_pipe.append((" ".join(tokens).lower()))
+    return preproc_pipe
 
 
 def vectorize_text(df, text_col, vectorizer):

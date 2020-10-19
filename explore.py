@@ -47,7 +47,7 @@ from vectorize_text_study import run_vectorize_text_study
 st.markdown(
     """
     ## Vectorizing abstracts
-    **Warning:** This is slow for n > 1000 docs
+    **Warning:** This is slow for n > 10 000 docs
     """
 )
 if st.button("Vectorize text"):

@@ -7,21 +7,11 @@ import numpy as np
 
 
 def run_vectorize_text_study(raw_docs):
-    st.header("Vectorizing text study")
-
-    if st.button("Show examples of preprocessing text"):
-        n_examples = 2
-        st.markdown("### Example of preprocessing {} abstracts".format(n_examples))
-        preprocessing_examples = pd.DataFrame(
-            [
-                [text, preprocess_text(text)]
-                for text in raw_docs["Abstract"][:n_examples]
-            ],
-            columns=["Raw text", "Preprocessed text"],
-        )
-        st.table(preprocessing_examples)
-
     df = raw_docs.assign(processed_abstract=preprocess_text_col(raw_docs["Abstract"]))
+
+    n_examples = 2
+    st.markdown("### Example of preprocessing {} abstracts".format(n_examples))
+    st.table(df[["Abstract", "processed_abstract"]][:n_examples])
 
     min_df = 0.1
     bow_model, vectorizer = vectorize_text(
