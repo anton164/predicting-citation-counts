@@ -5,6 +5,7 @@
 1. Install dependencies
 ```
 pip install -r requirements.txt
+python -m spacy download en
 ```
 2. Copy datasets to the repository manually
    - 250k.docs.jsonl (sample of 250k docs)

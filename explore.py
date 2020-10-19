@@ -42,10 +42,21 @@ from distribution_study import run_distribution_study
 
 run_distribution_study(raw_docs)
 
+from vectorize_text_study import run_vectorize_text_study
+
+st.markdown(
+    """
+    ## Vectorizing abstracts
+    **Warning:** This is slow for n > 1000 docs
+    """
+)
+if st.button("Vectorize text"):
+    run_vectorize_text_study(raw_docs)
+
 st.markdown(
     """
     ## One-hot encoding authors
-    **Warning:** This is slow on large datasets
+    **Warning:** This is slow on n > 10 000 docs
     """
 )
 if st.button("Run one-hot encoding"):

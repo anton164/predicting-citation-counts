@@ -7,3 +7,4 @@ seaborn
 scikit-learn
 plotly
 pycld2
+spacy
