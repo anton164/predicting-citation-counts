@@ -62,7 +62,8 @@ def run_correlation_study(raw_docs):
         journals,
         include=["Publisher", "JournalName", *field_of_study[:3]],
     )
-    journals = dt.encode_categorical(journals, str_cols)
+    le_dic = {}
+    journals = dt.encode_categorical(journals, str_cols, le_dic)
     st.write(journals.head())
 
     y_columns = ["Rank", "CitationCount"]
