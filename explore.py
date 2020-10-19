@@ -68,8 +68,6 @@ def load_dataset(dataset_filename, limit):
             del doc["BookTitle"]
             del doc["Volume"]
             del doc["Issue"]
-            # del doc["FirstPage"]
-            # del doc["LastPage"]
 
             json_data.append(doc)
             i += 1
@@ -110,8 +108,6 @@ else:
     st.subheader("First 10 rows")
     st.write(raw_docs.head(10))
 
-st.subheader("First 10 rows")
-st.write(raw_docs.head(10))
 
 from correlation_study import run_correlation_study
 run_correlation_study(raw_docs)

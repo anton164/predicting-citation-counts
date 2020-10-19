@@ -1,19 +1,21 @@
 import streamlit as st
 import data_tools as dt
 
+
 def run_correlation_study(raw_docs):
     st.title("Correlation Study")
 
     st.header("1. Dependent Variable Analysis")
     dt.describe(raw_docs.Rank, title="Rank", xlabel="Rank (discrete)")
     dt.describe(
-        raw_docs.CitationCount, title="Citation Count", xlabel="Citation Count (discrete)"
+        raw_docs.CitationCount,
+        title="Citation Count",
+        xlabel="Citation Count (discrete)",
     )
 
     st.subheader("Rank vs. Citation Count (Small correlation)")
     dt.correlation(raw_docs, ["Rank", "CitationCount"])
     dt.show_relative_scatter(raw_docs, "Rank", "CitationCount")
-
 
     st.header("2. Independent Variable Analysis")
     st.subheader("DocType")
@@ -31,7 +33,9 @@ def run_correlation_study(raw_docs):
     books = df[df["DocType"] == "Book"]
     dt.describe(books.Rank, title="Book Rank", xlabel="Rank (discrete)")
     dt.describe(
-        books.CitationCount, title="Book Citation Count", xlabel="Citation Count (discrete)"
+        books.CitationCount,
+        title="Book Citation Count",
+        xlabel="Citation Count (discrete)",
     )
 
     patents = df[df["DocType"] == "Patent"]
@@ -43,7 +47,9 @@ def run_correlation_study(raw_docs):
     )
 
     conference_papers = df[df["DocType"] == "Conference"]
-    dt.describe(conference_papers.Rank, title="Conference Rank", xlabel="Rank (discrete)")
+    dt.describe(
+        conference_papers.Rank, title="Conference Rank", xlabel="Rank (discrete)"
+    )
     dt.describe(
         conference_papers.CitationCount,
         title="Conference Citation Count",
