@@ -27,6 +27,7 @@ def time_it(label, fn):
     return wrapper
 
 
+@st.cache
 def one_hot_encode_authors(df):
     author_cols = [col for col in df if col.startswith("Author_")]
     df = pd.get_dummies(df, columns=author_cols, sparse=True, prefix="Author")
@@ -64,7 +65,7 @@ def strip_unprintable(s):
     return "".join(c for c in s if c.isprintable())
 
 
-@st.cache(suppress_st_warning=True)
+@st.cache(suppress_st_warning=True, persist=True)
 def load_dataset(dataset_filename, limit):
     loading_bar = st.progress(0)
     json_data = []
