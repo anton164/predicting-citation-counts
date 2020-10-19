@@ -101,8 +101,6 @@ def load_dataset(dataset_filename, limit):
             del doc["BookTitle"]
             del doc["Volume"]
             del doc["Issue"]
-            del doc["FirstPage"]
-            del doc["LastPage"]
 
             json_data.append(doc)
             i += 1
