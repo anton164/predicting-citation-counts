@@ -1,37 +1,7 @@
-import time
-import streamlit as st
 import pandas as pd
 import os
+import streamlit as st
 import json
-import pycld2 as cld2
-import regex
-
-
-def time_it(label, fn):
-    """
-    Wrap a function with a timer
-
-    label: string label or method that creates a label from the result of calling fn
-    fn: the function to wrap
-    """
-
-    def wrapper(*args):
-        start_time = time.perf_counter()
-        result = fn(*args)
-        end_time = time.perf_counter()
-        label_str = str(label(result)) if callable(label) else str(label)
-
-        print("[Timer]: {} took {:.3f}s".format(label_str, end_time - start_time))
-        return result
-
-    return wrapper
-
-
-@st.cache
-def one_hot_encode_authors(df):
-    author_cols = [col for col in df if col.startswith("Author_")]
-    df = pd.get_dummies(df, columns=author_cols, sparse=True, prefix="Author")
-    return df
 
 
 def st_dataset_selector():
@@ -51,9 +21,6 @@ def st_dataset_selector():
         list(datasets.keys()),
         format_func=lambda x: datasets[x],
     )
-
-
-RE_BAD_CHARS = regex.compile(r"\p{Cc}|\p{Cs}")
 
 
 # Due to https://github.com/mikemccand/chromium-compact-language-detector/issues/22
@@ -120,23 +87,3 @@ def load_dataset(dataset_filename, limit):
 
     loading_bar.empty()
     return df
-
-
-def cld2_detect_language(text):
-    """
-    Detect language of text using cld2
-    See https://pypi.org/project/pycld2/ for an example
-    """
-    try:
-        isReliable, textBytesFound, details = cld2.detect(text)
-    except:
-        st.header("Failed to detect language for:")
-        st.write(text)
-        raise
-
-    return details[0]
-
-
-@st.cache
-def detect_language(df_column):
-    return df_column.apply(lambda x: cld2_detect_language(x)[0])
