@@ -5,7 +5,7 @@
 1. Install dependencies
 ```
 pip install -r requirements.txt
-python -m spacy download en
+python -m spacy download en_core_web_sm
 ```
 2. Copy datasets to the repository manually
    - 250k.docs.jsonl (sample of 250k docs)

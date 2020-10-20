@@ -1,7 +1,7 @@
 import pandas as pd
 import streamlit as st
 import plotly.express as px
-from feature_utils import add_language_feature
+from .featurizer import add_language_feature
 import spacy
 import numpy as np
 

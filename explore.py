@@ -1,10 +1,10 @@
 import pandas as pd
 import streamlit as st
-from utils import (
-    time_it,
-    one_hot_encode_authors,
+from data_tools import (
     st_dataset_selector,
     load_dataset,
+    time_it,
+    one_hot_encode_authors,
 )
 
 st.header("Data Exploration")

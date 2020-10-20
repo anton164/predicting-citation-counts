@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
+from .language_tools import detect_language
 
 
 def get_page_count(first_page, last_page):
@@ -35,3 +36,18 @@ def decode_categorical(df, cols, le_dic):
             t[col] = le_dic[col].inverse_transform(t.loc[:, col])
 
     return t
+
+
+@st.cache
+def add_language_feature(df):
+    language_column = detect_language(df["Abstract"])
+    df_with_language = df.assign(Language=language_column)
+
+    return df_with_language
+
+
+@st.cache
+def one_hot_encode_authors(df):
+    author_cols = [col for col in df if col.startswith("Author_")]
+    df = pd.get_dummies(df, columns=author_cols, sparse=True, prefix="Author")
+    return df

@@ -1,7 +1,7 @@
 import pandas as pd
 import streamlit as st
 import plotly.express as px
-from text_utils import preprocess_text, preprocess_text_col, vectorize_text
+from data_tools import preprocess_text, preprocess_text_col, vectorize_text
 from sklearn.feature_extraction.text import CountVectorizer
 import numpy as np
 
