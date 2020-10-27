@@ -45,6 +45,10 @@ st.header("Experiment Setup")
 doc_types, features, dependent_features = feature_selection.data_selection(raw_docs)
 
 
+st.subheader("Part 2b: Dependent variable selection")
+dependent_variable_list = ["Rank", "CitationCount"]
+dependent_features = components.get_checkboxes(dependent_variable_list)
+
 st.subheader("Part 3: Compile Dataset")
 filename = st.text_input("Filename (Don't add .csv):", "")
 save = components.get_checkboxes(["Save after compiling"])
