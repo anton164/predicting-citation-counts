@@ -5,6 +5,7 @@ from .featurizer import add_language_feature
 import spacy
 import numpy as np
 
+# if this throws and error do: python -m spacy download en_core_web_sm
 nlp = spacy.load("en_core_web_sm")
 STOPWORDS = nlp.Defaults.stop_words
 
