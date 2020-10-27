@@ -1,1 +1,1 @@
-from .example import Experiment
+from .base import Experiment
