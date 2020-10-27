@@ -7,8 +7,8 @@ from sklearn.model_selection import (
 
 class Experiment:
     def __init__(self, pandas_df):
-        self.X = pandas_df.iloc[:, :-1]
-        self.y = pandas_df.iloc[:, -1]
+        self.X = pandas_df.iloc[:, :-1].values
+        self.y = pandas_df.iloc[:, -1].values
         self.model = None
 
     def run(self):
