@@ -2,7 +2,7 @@ import streamlit as st
 import data_tools as dt
 
 
-def run_correlation_study(raw_docs):
+def run_correlation_study(raw_docs, author_map):
     st.title("Correlation Study")
 
     st.header("1. Dependent Variable Analysis")
@@ -16,6 +16,16 @@ def run_correlation_study(raw_docs):
     st.subheader("Rank vs. Citation Count (Small correlation)")
     dt.correlation(raw_docs, ["Rank", "CitationCount"])
     dt.show_relative_scatter(raw_docs, "Rank", "CitationCount")
+
+    df = dt.add_author_prominence_feature(raw_docs, author_map)
+
+    st.subheader("Rank vs. Author Prominence")
+    dt.correlation(df, ["Rank", "AuthorProminence"])
+    dt.show_relative_scatter(df, "Rank", "AuthorProminence")
+
+    st.subheader("CitationCount vs. Author Prominence")
+    dt.correlation(df, ["CitationCount", "AuthorProminence"])
+    dt.show_relative_scatter(df, "CitationCount", "AuthorProminence")
 
     st.header("2. Independent Variable Analysis")
     st.subheader("DocType")

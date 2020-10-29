@@ -5,6 +5,7 @@ from data_tools import (
     load_dataset,
     time_it,
     one_hot_encode_authors,
+    add_author_prominence_feature
 )
 
 st.header("Data Exploration")
@@ -22,7 +23,7 @@ docs_limit = st.number_input(
 )
 selected_dataset = st_dataset_selector()
 
-raw_docs = load_dataset(selected_dataset, docs_limit)
+raw_docs, author_map = load_dataset(selected_dataset, docs_limit)
 
 st.subheader("Raw docs shape")
 raw_docs.shape
@@ -35,7 +36,7 @@ st.write(", ".join(raw_docs.columns))
 
 from correlation_study import run_correlation_study
 
-run_correlation_study(raw_docs)
+run_correlation_study(raw_docs, author_map)
 
 
 from distribution_study import run_distribution_study
