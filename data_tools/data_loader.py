@@ -37,6 +37,7 @@ def load_dataset(dataset_filename, limit):
     loading_bar = st.progress(0)
     json_data = []
     i = 0
+    author_map = {}
     print("Loading dataset")
     with open(dataset_filename) as file:
         for json_line in file:
@@ -46,7 +47,24 @@ def load_dataset(dataset_filename, limit):
 
             # Extract author id (we don't care about AuthorName and SequenceNumber for now)
             for k, author in enumerate(doc["Authors"]):
-                doc["Author_" + str(k + 1)] = author["AuthorId"]
+                author_id = author["AuthorId"]
+                doc["Author_" + str(k + 1)] = author_id
+                citation_count = doc["CitationCount"]
+
+                if (author_id in author_map):
+                    author_map[author_id]["TotalCitationCount"] += int(citation_count)
+                    author_map[author_id]["PaperCount"] += 1
+                    author_map[author_id]["CitationCounts"][doc["PaperId"]] = int(citation_count)
+                else:
+                    author_map[author_id] = {
+                        "Name": author["Name"],
+                        "TotalCitationCount": int(citation_count),
+                        "PaperCount": 1,
+                        "CitationCounts": {
+                            doc["PaperId"]: int(citation_count)
+                        }
+                    }
+
             del doc["Authors"]
 
             # Map fields of study
@@ -86,4 +104,5 @@ def load_dataset(dataset_filename, limit):
     print("Created DataFrame")
 
     loading_bar.empty()
-    return df
+
+    return df, author_map
