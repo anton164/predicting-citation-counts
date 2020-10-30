@@ -3,7 +3,9 @@ from .components import (
     get_checkboxes,
 )
 from data_tools import separate_datasets
+import os
 
+SAVED_FILE_DIR = "./saved"
 
 def data_selection(data):
     st.subheader("Part 1: Type selection")
@@ -56,5 +58,7 @@ def compile_df(
     st.write(df.head(5))
 
     if out_file:
-        df.to_csv(f"{out_file}.csv")
+        if not os.path.exists(SAVED_FILE_DIR):
+            os.mkdir(SAVED_FILE_DIR)
+        df.to_csv(os.path.join(SAVED_FILE_DIR, f"{out_file}.csv"))
     return df
