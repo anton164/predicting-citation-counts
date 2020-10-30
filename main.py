@@ -4,7 +4,6 @@ import time
 import pandas as pd
 import streamlit as st
 from data_tools import (
-    separate_datasets,
     st_dataset_selector,
     load_dataset,
     time_it,
@@ -35,19 +34,13 @@ docs_limit = st.number_input(
 )
 selected_dataset = st_dataset_selector()
 
-raw_docs = load_dataset(selected_dataset, docs_limit)
-
+raw_docs, author_map = load_dataset(selected_dataset, docs_limit)
 
 ##############
 # Extracts available data columns and creates checkboxes
 ##############
 st.header("Experiment Setup")
 doc_types, features, dependent_features = feature_selection.data_selection(raw_docs)
-
-
-st.subheader("Part 2b: Dependent variable selection")
-dependent_variable_list = ["Rank", "CitationCount"]
-dependent_features = components.get_checkboxes(dependent_variable_list)
 
 st.subheader("Part 3: Compile Dataset")
 filename = st.text_input("Filename (Don't add .csv):", "")
