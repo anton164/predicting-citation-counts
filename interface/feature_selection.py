@@ -60,5 +60,5 @@ def compile_df(
     if out_file:
         if not os.path.exists(SAVED_FILE_DIR):
             os.mkdir(SAVED_FILE_DIR)
-        df.to_csv(os.path.join(SAVED_FILE_DIR, f"{out_file}.csv"))
+        df.to_csv(os.path.join(SAVED_FILE_DIR, f"{out_file}.csv"), index_label="PaperId")
     return df
