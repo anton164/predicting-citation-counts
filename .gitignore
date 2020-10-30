@@ -138,3 +138,6 @@ mag5.docs.jsonl
 
 # VS Code
 .vscode
+
+# data files
+saved/*
