@@ -25,7 +25,6 @@ load_dataset = time_it(
     lambda df: "Loading dataset ({} docs)".format((len(df))),
     load_dataset,
 )
-one_hot_encode_authors = time_it("One-hot encoding authors", one_hot_encode_authors)
 
 docs_limit = st.number_input(
     "Max limit of docs to parse (more than 10000 items will be slow)",
