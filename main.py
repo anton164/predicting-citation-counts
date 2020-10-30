@@ -51,9 +51,9 @@ if st.button("Create Dataset"):
     if save["Save after compiling"]:
         if filename == "":
             filename = str(int(time.time()))
-            df = feature_selection.compile_df(
-                raw_docs, doc_types, features, dependent_features, out_file=filename
-            )
+        df = feature_selection.compile_df(
+            raw_docs, doc_types, features, dependent_features, out_file=filename
+        )
     else:
         df = feature_selection.compile_df(
             raw_docs, doc_types, features, dependent_features
