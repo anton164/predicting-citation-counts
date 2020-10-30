@@ -11,7 +11,7 @@ from data_tools import (
 st.header("Data Exploration")
 # Wrap methods with timer:
 load_dataset = time_it(
-    lambda df: "Loading dataset ({} docs)".format((len(df))),
+    lambda ret: "Loading dataset ({} docs)".format((len(ret[0]))),
     load_dataset,
 )
 one_hot_encode_authors = time_it("One-hot encoding authors", one_hot_encode_authors)

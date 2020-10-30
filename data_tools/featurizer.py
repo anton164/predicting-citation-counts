@@ -52,7 +52,7 @@ def one_hot_encode_authors(df):
     df = pd.get_dummies(df, columns=author_cols, sparse=True, prefix="Author")
     return df
 
-def extract_author_prominence_feature(doc, author_map):
+def extract_author_prominence_feature(doc, author_map, prominence_threshold = 0):
 
     # Option 1: Averaged sum of all author citation counts
     author_cols = doc.index.str.startswith("Author_")
@@ -62,16 +62,19 @@ def extract_author_prominence_feature(doc, author_map):
     author_prominence = 0
     for author_id in author_ids:
         author_prominence += author_map[author_id]["TotalCitationCount"] - author_map[author_id]["CitationCounts"][doc["PaperId"]]
-    return author_prominence / len(author_ids)
+    # return author_prominence / len(author_ids)
 
     # Option 2: Citation count of main author
     # author_id = doc["Author_0"]
     # author_prominence = author_map[author_id]["TotalCitationCount"] - author_map[author_id]["CitationCounts"][doc["PaperId"]]
     # return author_prominence
 
+    # Option 3 Binary prominent author feature
+    return 1 if (author_prominence > prominence_threshold) else 0
+
 @st.cache
 def add_author_prominence_feature(df, author_map):
-    author_prominence_column = df.apply(lambda doc: extract_author_prominence_feature(doc, author_map), axis=1)
+    author_prominence_column = df.apply(lambda doc: extract_author_prominence_feature(doc, author_map, 50), axis=1)
     df_with_author_prominence = df.assign(AuthorProminence=author_prominence_column)
 
     return df_with_author_prominence

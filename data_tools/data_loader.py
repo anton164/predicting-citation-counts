@@ -42,26 +42,26 @@ def load_dataset(dataset_filename, limit):
     with open(dataset_filename) as file:
         for json_line in file:
             doc = json.loads(json_line)
-
             doc["Abstract"] = strip_unprintable(doc["Abstract"])
 
             # Extract author id (we don't care about AuthorName and SequenceNumber for now)
             for k, author in enumerate(doc["Authors"]):
                 author_id = author["AuthorId"]
                 doc["Author_" + str(k + 1)] = author_id
-                citation_count = doc["CitationCount"]
+                citation_count = int(doc["CitationCount"])
 
                 if (author_id in author_map):
-                    author_map[author_id]["TotalCitationCount"] += int(citation_count)
-                    author_map[author_id]["PaperCount"] += 1
-                    author_map[author_id]["CitationCounts"][doc["PaperId"]] = int(citation_count)
+                    author_record = author_map[author_id]
+                    author_record["TotalCitationCount"] += citation_count
+                    author_record["PaperCount"] += 1
+                    author_record["CitationCounts"][doc["PaperId"]] = citation_count
                 else:
                     author_map[author_id] = {
                         "Name": author["Name"],
-                        "TotalCitationCount": int(citation_count),
+                        "TotalCitationCount": citation_count,
                         "PaperCount": 1,
                         "CitationCounts": {
-                            doc["PaperId"]: int(citation_count)
+                            doc["PaperId"]: citation_count
                         }
                     }
 
