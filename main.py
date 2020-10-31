@@ -1,32 +1,31 @@
+from math import exp
+from numpy.core.numeric import outer
+import time
+import pandas as pd
+import streamlit as st
+from interface import (
+    components,
+    feature_selection,
+)
+import experiments
+from data_tools import (
+    st_dataset_selector,
+    load_dataset,
+    time_it,
+    one_hot_encode_authors,
+)
+# Wrap methods with timer:
+load_dataset = time_it(
+    lambda ret: "Loading dataset ({} docs)".format((len(ret[0]))),
+    load_dataset,
+)
+
 def feature_selection_page():
-    from math import exp
-    from numpy.core.numeric import outer
-    import time
-    import pandas as pd
-    import streamlit as st
-    from data_tools import (
-        st_dataset_selector,
-        load_dataset,
-        time_it,
-        one_hot_encode_authors,
-    )
-    from interface import (
-        components,
-        feature_selection,
-    )
-    import experiments
-    
     ###############
     # Application Header and data loading
     ###############
 
     st.header("Data Exploration")
-    # Wrap methods with timer:
-    load_dataset = time_it(
-        lambda ret: "Loading dataset ({} docs)".format((len(ret[0]))),
-        load_dataset,
-    )
-
     docs_limit = st.number_input(
         "Max limit of docs to parse (more than 10000 items will be slow)",
         value=1000,
@@ -55,6 +54,7 @@ def feature_selection_page():
             df = feature_selection.compile_df(
                 raw_docs, doc_types, features, dependent_features, out_file=filename
             )
+            st.write("Successfully saved dataframe to " + filename)
         else:
             df = feature_selection.compile_df(
                 raw_docs, doc_types, features, dependent_features
