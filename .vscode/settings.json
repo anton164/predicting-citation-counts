@@ -1,6 +1,0 @@
-{
-    "python.pythonPath": "/Users/janhenrikbernhard/opt/anaconda3/envs/aml/bin/python",
-    "python.linting.pylintEnabled": false,
-    "python.linting.banditEnabled": true,
-    "python.linting.enabled": true
-}
