@@ -7,6 +7,7 @@ COPY app.py ./app.py
 COPY main.py ./main.py
 COPY experiment_selection.py ./experiment_selection.py
 COPY data_tools ./data_tools
+COPY interface ./interface
 COPY experiments ./experiments
 COPY correlation_study.py ./correlation_study.py
 COPY distribution_study.py ./distribution_study.py
