@@ -5,16 +5,19 @@
 1. Install dependencies
 ```
 pip install -r requirements.txt
+python -m spacy download en_core_web_sm
 ```
 2. Copy datasets to the repository manually
    - 250k.docs.jsonl (sample of 250k docs)
    - mag5.docs.jsonl (full dataset with 5 mill docs)
 
-## Cloud instances
-- [main branch (GCP)](http://34.123.178.135/)
-- [anton/main branch (GCP)](http://35.184.151.238/)
-- [jan/main branch (GCP)](http://35.188.114.198/)
-- [eli/main branch (GCP)](http://35.184.94.57/)
+## Cloud instances 
+- main branch (GCP)
+- anton/main branch (GCP)
+- jan/main branch (GCP)
+- eli/main branch (GCP)
+
+[IPs can be found here](https://console.cloud.google.com/compute/instances?project=stellar-mercury-292013) or by checking the final step of the github workflow.
 
 ## Run locally
 ```

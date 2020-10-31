@@ -137,4 +137,7 @@ dmypy.json
 mag5.docs.jsonl
 
 # VS Code
-.vscode
+.vscode/
+
+# data files
+saved/*

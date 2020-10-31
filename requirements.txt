@@ -2,3 +2,9 @@ streamlit
 pandas
 bandit
 black
+matplotlib
+seaborn
+scikit-learn
+plotly
+pycld2
+spacy
