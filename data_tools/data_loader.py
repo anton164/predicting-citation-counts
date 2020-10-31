@@ -3,13 +3,16 @@ import os
 import streamlit as st
 import json
 
-def st_saved_dataset_selector():
+def get_saved_data_location():
     # Enables streamlit to read data from mounted disk in GCP
-    dataset_location = "./"
+    data_location = "./"
     if "STREAMLIT_DATA_LOCATION" in os.environ:
-        dataset_location = os.environ["STREAMLIT_DATA_LOCATION"]
+        data_location = os.environ["STREAMLIT_DATA_LOCATION"]
 
-    dir_name = dataset_location + "saved/"
+    return data_location + "saved/"
+
+def st_saved_dataset_selector():
+    dir_name = get_saved_data_location()
     files = os.listdir(dir_name)
 
     return st.selectbox(

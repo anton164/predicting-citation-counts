@@ -2,10 +2,10 @@ import streamlit as st
 from .components import (
     get_checkboxes,
 )
-from data_tools import separate_datasets
+from data_tools import separate_datasets, get_saved_data_location
 import os
 
-SAVED_FILE_DIR = "./saved"
+SAVED_FILE_DIR = get_saved_data_location()
 
 def data_selection(data):
     st.subheader("Part 1: Type selection")
