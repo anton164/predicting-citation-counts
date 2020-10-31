@@ -2,15 +2,19 @@ import streamlit as st
 from .components import (
     get_checkboxes,
 )
-from data_tools import separate_datasets, get_saved_data_location
+from data_tools import separate_datasets, detect_language, get_saved_data_location
 import os
 
 SAVED_FILE_DIR = get_saved_data_location()
 
 def data_selection(data):
-    st.subheader("Part 1: Type selection")
+    st.subheader("Part 1a: Type selection")
     doc_type_list = data.DocType.unique().tolist()
     doc_types = get_checkboxes(doc_type_list)
+
+    st.subheader("Part 1b: Language filter")
+    language_list = ["ENGLISH", "GERMAN", "FRENCH", "SPANISH", "PORTUGUESE"]
+    include_languages = get_checkboxes(language_list)
 
     st.subheader("Part 2a: Independent variable selection")
     feature_list = [
@@ -24,12 +28,15 @@ def data_selection(data):
     st.subheader("Part 2b: Dependent variable selection")
     dependent_variable_list = ["Rank", "CitationCount"]
     dependent_features = get_checkboxes(dependent_variable_list)
-    return doc_types, features, dependent_features
+
+    return doc_types, features, dependent_features, include_languages
 
 
 def compile_df(
-    data, category_dict, features_dict, dependent_feature_dict, out_file=None
+    data, category_dict, features_dict, dependent_feature_dict, include_languages, out_file=None
 ):
+    if (include_languages):
+        data = data[detect_language(data["Abstract"]).isin(include_languages)]
     selected_types = [k for k, v in category_dict.items() if v]
     selected_features = [k for k, v in features_dict.items() if v]
     selected_dependent_features = [k for k, v in dependent_feature_dict.items() if v]
