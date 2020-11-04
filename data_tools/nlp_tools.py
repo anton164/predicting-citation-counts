@@ -17,6 +17,7 @@ STOPWORDS = nlp.Defaults.stop_words
 def include_token(token):
     return (
         not token.is_punct
+        and not token.like_num
         and token.lemma_ != "-PRON-"
         and token.lemma_ not in STOPWORDS
         and not token.is_space
@@ -45,7 +46,9 @@ def preprocess_text_col(text_col):
         preproc_pipe.append((" ".join(tokens).lower()))
     return preproc_pipe
 
-
+@st.cache(
+    allow_output_mutation=True
+)
 def vectorize_text(df, text_col, vectorizer):
     vectorized = vectorizer.fit_transform(df[text_col])
     vectorized_df = pd.DataFrame.sparse.from_spmatrix(

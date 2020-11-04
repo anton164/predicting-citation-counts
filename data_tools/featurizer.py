@@ -68,7 +68,7 @@ def extract_author_prominence_feature(doc, author_map, prominence_threshold=0):
             author_map[author_id]["TotalCitationCount"]
             - author_map[author_id]["CitationCounts"][doc["PaperId"]]
         )
-    # return author_prominence / len(author_ids)
+    return author_prominence / len(author_ids)
 
     # Option 2: Citation count of main author
     # author_id = doc["Author_0"]
@@ -76,7 +76,7 @@ def extract_author_prominence_feature(doc, author_map, prominence_threshold=0):
     # return author_prominence
 
     # Option 3 Binary prominent author feature
-    return 1 if (author_prominence > prominence_threshold) else 0
+    # return 1 if (author_prominence > prominence_threshold) else 0
 
 
 @st.cache
