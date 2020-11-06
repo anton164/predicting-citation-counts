@@ -44,7 +44,6 @@ def feature_selection_page():
     (
         doc_types,
         features,
-        dependent_features,
         derived_features,
         included_languages,
     ) = feature_selection.data_selection(raw_docs)
@@ -63,7 +62,6 @@ def feature_selection_page():
                 author_map,
                 doc_types,
                 features,
-                dependent_features,
                 derived_features,
                 included_languages,
                 out_file=filename,
@@ -75,7 +73,6 @@ def feature_selection_page():
                 author_map,
                 doc_types,
                 features,
-                dependent_features,
                 derived_features,
                 included_languages,
             )
