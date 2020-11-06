@@ -6,7 +6,7 @@ def get_checkboxes(label_list, num_cols=3):
     cols = st.beta_columns(num_cols)
     for i, label in enumerate(label_list):
         col = cols[i % num_cols]
-        chx_bx = col.checkbox(str(label))
+        chx_bx = col.checkbox(str(label), value=True)
         out_dict[label] = chx_bx
 
     return out_dict
