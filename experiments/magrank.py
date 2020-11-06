@@ -19,14 +19,12 @@ from sklearn.preprocessing import FunctionTransformer, OneHotEncoder, LabelEncod
 from sklearn.pipeline import Pipeline, FeatureUnion
 from .sklearn_utils import ClfSwitcher
 from sklearn.model_selection import GridSearchCV
+from xgboost import XGBRegressor
 
-def one_hot_encode(df, columns):
-    df = pd.get_dummies(
-        df,
-        columns=columns,
-    )
-    df = df.fillna(0)
-    return df
+
+@st.cache(allow_output_mutation = True)
+def hyperparameter_tuning(pipeline, parameters):
+    return GridSearchCV(pipeline, parameters, cv=5, n_jobs=12, return_train_score=False, verbose=3)
 
 select_columns = lambda features: FunctionTransformer(lambda x: x[features], validate=False)
 
@@ -51,6 +49,7 @@ def print_model_results(Y_pred, Y_test):
 
 class MagRankExperiment(Experiment):
     def __init__(self, pandas_df):
+
         # Drop non-numeric page features and add PageCount feature
         pandas_df[["FirstPage", "LastPage"]] = pandas_df[
             ["FirstPage", "LastPage"]
@@ -75,10 +74,9 @@ class MagRankExperiment(Experiment):
         st.write("X shape: " + str(self.X.shape))
         st.write("Y shape: " + str(self.y.shape))
 
-        # df.select_dtypes(exclude=["int", "float"]).columns
-        #self.X = one_hot_encode(self.X, ["FieldOfStudy_0", "FieldOfStudy_1"])
         self.X = self.X.assign(Processed_Abstract=preprocess_text_col(self.X["Abstract"]))
         self.X = self.X.fillna('None')
+
         st.subheader("After Preprocessing")
         st.write("X shape: " + str(self.X.shape))
         st.write("Y shape: " + str(self.y.shape))
@@ -86,16 +84,14 @@ class MagRankExperiment(Experiment):
     def run(self):
         self.preprocess()
         self.split(0.15)
-        self.train()
-        self.evaluate()
-        pass
-
-    def train(self):
         st.write("X_train shape: " + str(self.X_train.shape))
         st.write("y_train shape: " + str(self.y_train.shape))
-        # st.write(self.X_train[:5])
-        # st.write(self.y_train[:5])
-
+        self.model = self.train()
+        self.evaluate()
+        pass
+    
+    @st.cache
+    def train(self):
         self.model_pipeline = Pipeline([
             ('features', FeatureUnion([
                 ('numeric', Pipeline([
@@ -115,60 +111,72 @@ class MagRankExperiment(Experiment):
         ])
 
         self.pipeline_parameters = [{
-            'features__text__tfidf__max_df': (0.25, 0.5, 0.75, 1.0),
+            'features__text__tfidf__max_df': (0.25, 0.5, 0.75),
             'clf__estimator': [GradientBoostingRegressor(random_state=0)],
-            'clf__estimator__max_depth': (1, 4, 10)
+            'clf__estimator__max_depth': (1, 10, 25)
         }, {
-            'features__text__tfidf__max_df': (0.25, 0.5, 0.75, 1.0),
+            'features__text__tfidf__max_df': (0.25, 0.5, 0.75),
             'clf__estimator': [Ridge()],
             'clf__estimator__alpha': (0, 0.1, 1, 10)
+        }, {
+            'features__text__tfidf__max_df': (0.25, 0.5, 0.75),
+            'clf__estimator': [LinearSVC(max_iter = 100)],
+            'clf__estimator__C': (0, 0.1, 1, 10)
+        }, {
+            'features__text__tfidf__max_df': (0.25, 0.5, 0.75),
+            'clf__estimator': [RandomForestRegressor(random_state = 0)],
+            'clf__estimator__max_depth': (1, 10, 25)
+        }, {
+            'features__text__tfidf__max_df': (0.25, 0.5, 0.75),
+            'clf__estimator': [XGBRegressor()],
         }]
 
-        self.models = [
-            # ("Ridge Regression", Ridge(1).fit(self.X_train, self.y_train)),
-            # ("Gradient Boosting", GradientBoostingRegressor(max_depth=4, random_state=0).fit(self.X_train, self.y_train))
-            # ("Linear SVM", LinearSVC(C=0.01, max_iter=80).fit(self.X_train, self.y_train)),
-            # ("Random Forest", RandomForestRegressor(max_depth=4, random_state=0).fit(self.X_train, self.y_train)),
-        ]
-
+        model = hyperparameter_tuning(self.model_pipeline, self.pipeline_parameters)
+        model.fit(self.X_train, self.y_train)
+        return model
 
 
     def evaluate(self):
+        st.header("Hyper-parameter tuning")
+        st.write("Best parameters:")
+        st.write(self.model.best_params_)
 
         count_samples = 10
         model_prediction_labels = ["Truth"]
         model_predictions = [self.y_test[:count_samples].values]
 
-        # for (model_name, model) in self.models:
-        #     y_pred = model.predict(self.X_test)
-        #     st.subheader(model_name)
-        #     print_model_results(y_pred, self.y_test)
+        models = [(self.model.best_params_["clf__estimator"], self.model)]
 
-        #     model_prediction_labels.append(model_name)
-        #     model_predictions.append(y_pred[:count_samples])
+        for (model_name, model) in models:
+            y_pred = model.predict(self.X_test)
+            st.subheader(model_name)
+            print_model_results(y_pred, self.y_test)
 
-        # st.dataframe(
-        #     pd.DataFrame(
-        #         data=np.array(model_predictions).reshape(
-        #             count_samples, len(model_predictions)
-        #         ),
-        #         columns=model_prediction_labels,
-        #     )
-        # )
+            model_prediction_labels.append(model_name)
+            model_predictions.append(y_pred[:count_samples])
 
-        clf = GridSearchCV(self.model_pipeline, self.pipeline_parameters, cv=5, n_jobs=12, return_train_score=False, verbose=3)
-        clf.fit(self.X_train, self.y_train)
+        st.dataframe(
+            pd.DataFrame(
+                data=np.array(model_predictions).reshape(
+                    count_samples, len(model_predictions)
+                ),
+                columns=model_prediction_labels,
+            )
+        )
 
-        st.write("Best parameters:")
-        st.write(clf.best_params_)
+        means = self.model.cv_results_['mean_test_score']
+        stds = self.model.cv_results_['std_test_score']
+        tuning_results = zip(
+            map(lambda result: result["clf__estimator"], self.model.cv_results_['params']), 
+            means, 
+            stds
+        )
 
-        print("Grid scores on development set:")
-        print()
-        means = clf.cv_results_['mean_test_score']
-        stds = clf.cv_results_['std_test_score']
-        for mean, std, params in zip(means, stds, clf.cv_results_['params']):
-            print("%0.3f (+/-%0.03f) for %r"
-                % (mean, std * 2, params))
-        print()
+        tuning_df = pd.DataFrame(
+            data=tuning_results,
+            columns=["Estimator", "Mean", "STD"]
+        )
+
+        st.write(tuning_df)
 
         pass
