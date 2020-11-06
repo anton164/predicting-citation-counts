@@ -13,7 +13,7 @@ def get_saved_data_location():
 
 def st_saved_dataset_selector():
     dir_name = get_saved_data_location()
-    files = os.listdir(dir_name)
+    files = [f for f in os.listdir(dir_name) if f.endswith(".csv")]
 
     return st.selectbox(
         "Selected Dataset",
