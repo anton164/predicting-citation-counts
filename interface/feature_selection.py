@@ -7,6 +7,7 @@ from data_tools import (
     get_saved_data_location,
     add_language_feature,
     add_author_prominence_feature,
+    add_magbin_feature
 )
 import os
 
@@ -32,7 +33,7 @@ def data_selection(data):
     dependent_features = get_checkboxes(dependent_variable_list)
 
     st.subheader("Part 2c: Derived features")
-    derived_features_labels = ["AuthorProminence"]
+    derived_features_labels = ["AuthorProminence", "MagBin"]
     derived_features = get_checkboxes(derived_features_labels)
 
     st.subheader("Part 2d: Languages to include")
@@ -75,6 +76,8 @@ def compile_df(
 
     if "AuthorProminence" in derived_features:
         df = add_author_prominence_feature(data, author_map)
+    if "MagBin" in derived_features:
+        df = add_magbin_feature(data)
 
     for k, v in category_dict.items():
         if not v:

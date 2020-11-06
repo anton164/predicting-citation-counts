@@ -3,6 +3,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import math
 from .language_tools import detect_language
+from sklearn.preprocessing import LabelEncoder
+
 
 def get_page_count(first_page, last_page):
     return [
@@ -78,3 +80,10 @@ def add_author_prominence_feature(df, author_map):
     df_with_author_prominence = df.assign(AuthorProminence=author_prominence_column)
 
     return df_with_author_prominence
+
+@st.cache
+def add_magbin_feature(df):
+    label_encoder = LabelEncoder()
+    df["MagBin"] = label_encoder.fit_transform(pd.cut(df.Rank, 6, retbins=True)[0])
+
+    return df
