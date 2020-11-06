@@ -1,3 +1,4 @@
+from data_tools.featurizer import add_citationbin_feature
 import streamlit as st
 from .components import (
     get_checkboxes,
@@ -29,7 +30,7 @@ def data_selection(data):
     features = get_checkboxes(feature_list)
 
     st.subheader("Part 2b: Derived features")
-    derived_features_labels = ["AuthorProminence", "MagBin"]
+    derived_features_labels = ["AuthorProminence", "MagBin", "CitationBin"]
     derived_features = get_checkboxes(derived_features_labels)
 
     st.subheader("Part 2c: Languages to include")
@@ -48,7 +49,7 @@ def compile_df(
     included_languages,
     out_file=None,
 ):
-    selected_types = [k for k, v in category_dict.items() if v]
+    selected_types = [str(k) for k, v in category_dict.items() if v]
     selected_features = [k for k, v in features_dict.items() if v]
     derived_features = [k for k, v in derived_features.items() if v]
     included_languages = [k for k, v in included_languages.items() if v]
@@ -68,16 +69,20 @@ def compile_df(
 
     df = data.copy()
 
+    # Add derived features
     if "AuthorProminence" in derived_features:
         df = add_author_prominence_feature(df, author_map)
     if "MagBin" in derived_features:
         df = add_magbin_feature(df)
-
-    print(df.columns)
+    if "CitationBin" in derived_features:
+        df = add_citationbin_feature(df)
 
     for k, v in category_dict.items():
         if not v:
-            df.drop(df[df.DocType == k].index, inplace=True)
+            if k:
+                df.drop(df[df.DocType == k].index, inplace=True)
+            else:
+                df.drop(df[df.DocType.isna()].index, inplace=True)
 
     df = separate_datasets(
         df, selected_features + derived_features, y_columns=None
