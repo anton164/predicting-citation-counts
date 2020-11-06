@@ -3,6 +3,7 @@ import os
 import streamlit as st
 import json
 
+
 def get_saved_data_location():
     # Enables streamlit to read data from mounted disk in GCP
     data_location = "./"
@@ -10,6 +11,7 @@ def get_saved_data_location():
         data_location = os.environ["STREAMLIT_DATA_LOCATION"]
 
     return data_location + "saved/"
+
 
 def st_saved_dataset_selector():
     dir_name = get_saved_data_location()
@@ -49,8 +51,9 @@ def strip_unprintable(s):
     """
     return "".join(c for c in s if c.isprintable())
 
+
 # Adding allow_output_mutation significantly speeds up
-# the caching: https://github.com/streamlit/streamlit/issues/898 
+# the caching: https://github.com/streamlit/streamlit/issues/898
 @st.cache(suppress_st_warning=True, persist=True, allow_output_mutation=True)
 def load_dataset(dataset_filename, limit):
     loading_bar = st.progress(0)
@@ -69,7 +72,7 @@ def load_dataset(dataset_filename, limit):
                 doc["Author_" + str(k + 1)] = author_id
                 citation_count = int(doc["CitationCount"])
 
-                if (author_id in author_map):
+                if author_id in author_map:
                     author_record = author_map[author_id]
                     author_record["TotalCitationCount"] += citation_count
                     author_record["PaperCount"] += 1
@@ -79,9 +82,7 @@ def load_dataset(dataset_filename, limit):
                         "Name": author["Name"],
                         "TotalCitationCount": citation_count,
                         "PaperCount": 1,
-                        "CitationCounts": {
-                            doc["PaperId"]: citation_count
-                        }
+                        "CitationCounts": {doc["PaperId"]: citation_count},
                     }
 
             del doc["Authors"]

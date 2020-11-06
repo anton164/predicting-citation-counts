@@ -55,7 +55,9 @@ def vectorize_text(df, text_col, vectorizer):
     return vectorized_df, vectorizer
 
 
-def tokenize(string, lower=True, punctuation=True, stops=True, lemmatize=True, check_english=True):
+def tokenize(
+    string, lower=True, punctuation=True, stops=True, lemmatize=True, check_english=True
+):
     """Tokenise a string into a vector"""
     stop_words = set(stopwords.words("english"))
     english_words = set(englishwords.words())

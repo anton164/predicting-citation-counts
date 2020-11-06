@@ -5,7 +5,7 @@ from data_tools import (
     load_dataset,
     time_it,
     one_hot_encode_authors,
-    add_author_prominence_feature
+    add_author_prominence_feature,
 )
 
 st.header("Data Exploration")

@@ -1,4 +1,3 @@
-from data_tools.featurizer import add_citationbin_feature
 import streamlit as st
 from .components import (
     get_checkboxes,
@@ -8,7 +7,8 @@ from data_tools import (
     get_saved_data_location,
     add_language_feature,
     add_author_prominence_feature,
-    add_magbin_feature
+    add_magbin_feature,
+    add_citationbin_feature,
 )
 import os
 
@@ -21,11 +21,7 @@ def data_selection(data):
     doc_types = get_checkboxes(doc_type_list)
 
     st.subheader("Part 2a: Feature selection")
-    feature_list = [
-        f
-        for f in data.columns.tolist()
-        if f not in ("DocType")
-    ]
+    feature_list = [f for f in data.columns.tolist() if f not in ("DocType")]
     feature_list.sort()
     features = get_checkboxes(feature_list)
 
@@ -84,9 +80,7 @@ def compile_df(
             else:
                 df.drop(df[df.DocType.isna()].index, inplace=True)
 
-    df = separate_datasets(
-        df, selected_features + derived_features, y_columns=None
-    )[0]
+    df = separate_datasets(df, selected_features + derived_features, y_columns=None)[0]
 
     st.subheader("Compiled dataframe shape")
     st.write(df.shape)
