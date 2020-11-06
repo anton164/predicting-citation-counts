@@ -9,3 +9,4 @@ plotly
 pycld2
 spacy
 nltk
+xgboost
