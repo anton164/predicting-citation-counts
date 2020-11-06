@@ -84,6 +84,6 @@ def add_author_prominence_feature(df, author_map):
 @st.cache
 def add_magbin_feature(df):
     label_encoder = LabelEncoder()
-    df["MagBin"] = label_encoder.fit_transform(pd.cut(df.Rank, 6, retbins=True)[0])
+    df["MagBin"] = label_encoder.fit_transform(pd.cut(df.Rank, 4, retbins=True)[0])
 
     return df

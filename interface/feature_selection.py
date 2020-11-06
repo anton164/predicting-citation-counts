@@ -75,9 +75,11 @@ def compile_df(
     df = data.copy()
 
     if "AuthorProminence" in derived_features:
-        df = add_author_prominence_feature(data, author_map)
+        df = add_author_prominence_feature(df, author_map)
     if "MagBin" in derived_features:
-        df = add_magbin_feature(data)
+        df = add_magbin_feature(df)
+
+    print(df.columns)
 
     for k, v in category_dict.items():
         if not v:
