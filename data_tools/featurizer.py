@@ -87,3 +87,10 @@ def add_magbin_feature(df):
     df["MagBin"] = label_encoder.fit_transform(pd.cut(df.Rank, 4, retbins=True)[0])
 
     return df
+
+@st.cache
+def add_citationbin_feature(df):
+    label_encoder = LabelEncoder()
+    df["CitationBin"] = label_encoder.fit_transform(pd.cut(df.CitationCount, 4, retbins=True)[0])
+
+    return df
