@@ -14,11 +14,13 @@ from data_tools import (
     time_it,
     one_hot_encode_authors,
 )
+
 # Wrap methods with timer:
 load_dataset = time_it(
     lambda ret: "Loading dataset ({} docs)".format((len(ret[0]))),
     load_dataset,
 )
+
 
 def feature_selection_page():
     ###############
@@ -39,12 +41,17 @@ def feature_selection_page():
     # Extracts available data columns and creates checkboxes
     ##############
     st.header("Experiment Setup")
-    doc_types, features, dependent_features = feature_selection.data_selection(raw_docs)
+    (
+        doc_types,
+        features,
+        dependent_features,
+        derived_features,
+        included_languages,
+    ) = feature_selection.data_selection(raw_docs)
 
     st.subheader("Part 3: Compile Dataset")
     filename = st.text_input("Filename (Don't add .csv):", "")
     save = components.get_checkboxes(["Save after compiling"])
-
 
     df = None
     if st.button("Create Dataset"):
@@ -52,13 +59,27 @@ def feature_selection_page():
             if filename == "":
                 filename = str(int(time.time()))
             df = feature_selection.compile_df(
-                raw_docs, doc_types, features, dependent_features, out_file=filename
+                raw_docs,
+                author_map,
+                doc_types,
+                features,
+                dependent_features,
+                derived_features,
+                included_languages,
+                out_file=filename,
             )
             st.write("Successfully saved dataframe to " + filename)
         else:
             df = feature_selection.compile_df(
-                raw_docs, doc_types, features, dependent_features
+                raw_docs,
+                author_map,
+                doc_types,
+                features,
+                dependent_features,
+                derived_features,
+                included_languages,
             )
+
 
 if __name__ == "__main__":
     feature_selection_page()
