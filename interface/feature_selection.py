@@ -2,10 +2,10 @@ import streamlit as st
 from .components import (
     get_checkboxes,
 )
-from data_tools import separate_datasets
+from data_tools import separate_datasets, get_saved_data_location
 import os
 
-SAVED_FILE_DIR = "./saved"
+SAVED_FILE_DIR = get_saved_data_location()
 
 def data_selection(data):
     st.subheader("Part 1: Type selection")
@@ -60,5 +60,5 @@ def compile_df(
     if out_file:
         if not os.path.exists(SAVED_FILE_DIR):
             os.mkdir(SAVED_FILE_DIR)
-        df.to_csv(os.path.join(SAVED_FILE_DIR, f"{out_file}.csv"))
+        df.to_csv(os.path.join(SAVED_FILE_DIR, f"{out_file}.csv"), index_label="PaperId")
     return df

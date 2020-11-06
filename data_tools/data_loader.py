@@ -3,6 +3,24 @@ import os
 import streamlit as st
 import json
 
+def get_saved_data_location():
+    # Enables streamlit to read data from mounted disk in GCP
+    data_location = "./"
+    if "STREAMLIT_DATA_LOCATION" in os.environ:
+        data_location = os.environ["STREAMLIT_DATA_LOCATION"]
+
+    return data_location + "saved/"
+
+def st_saved_dataset_selector():
+    dir_name = get_saved_data_location()
+    files = os.listdir(dir_name)
+
+    return st.selectbox(
+        "Selected Dataset",
+        ["None"] + list(map(lambda filename: os.path.join(dir_name, filename), files)),
+        format_func=lambda x: x.replace(dir_name, ""),
+    )
+
 
 def st_dataset_selector():
     # Enables streamlit to read data from mounted disk in GCP
@@ -31,8 +49,9 @@ def strip_unprintable(s):
     """
     return "".join(c for c in s if c.isprintable())
 
-
-@st.cache(suppress_st_warning=True, persist=True)
+# Adding allow_output_mutation significantly speeds up
+# the caching: https://github.com/streamlit/streamlit/issues/898 
+@st.cache(suppress_st_warning=True, persist=True, allow_output_mutation=True)
 def load_dataset(dataset_filename, limit):
     loading_bar = st.progress(0)
     json_data = []

@@ -20,6 +20,15 @@ python -m spacy download en_core_web_sm
 [IPs can be found here](https://console.cloud.google.com/compute/instances?project=stellar-mercury-292013) or by checking the final step of the github workflow.
 
 ## Run locally
+
 ```
-streamlit run explore.py
+streamlit run app.py
 ```
+
+*Or run individual streamlit pages:*
+
+- **Initial studies:** `streamlit run explore.py`
+- **Dataframe (feature) selection:** `streamlit run main.py`
+- **Experiment selection:** `streamlin run experiment_selection.py`
+
+

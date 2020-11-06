@@ -3,11 +3,14 @@ WORKDIR /app
 COPY requirements.txt ./requirements.txt
 RUN pip3 install -r requirements.txt
 RUN python -m spacy download en_core_web_sm
-COPY explore.py ./main.py
+COPY app.py ./app.py
+COPY main.py ./main.py
+COPY experiment_selection.py ./experiment_selection.py
 COPY data_tools ./data_tools
+COPY interface ./interface
 COPY experiments ./experiments
 COPY correlation_study.py ./correlation_study.py
 COPY distribution_study.py ./distribution_study.py
 COPY vectorize_text_study.py ./vectorize_text_study.py
 COPY sample_data.jsonl ./sample_data.jsonl
-CMD streamlit run main.py --server.port 80
+CMD streamlit run app.py --server.port 80
