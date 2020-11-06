@@ -15,7 +15,10 @@ from sklearn.svm import LinearSVC
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
-
+from sklearn.preprocessing import FunctionTransformer, OneHotEncoder, LabelEncoder
+from sklearn.pipeline import Pipeline, FeatureUnion
+from .sklearn_utils import ClfSwitcher
+from sklearn.model_selection import GridSearchCV
 
 def one_hot_encode(df, columns):
     df = pd.get_dummies(
@@ -25,6 +28,7 @@ def one_hot_encode(df, columns):
     df = df.fillna(0)
     return df
 
+select_columns = lambda features: FunctionTransformer(lambda x: x[features], validate=False)
 
 def print_model_results(Y_pred, Y_test):
     mean_absolute_error = np.abs(Y_pred - Y_test).mean()
@@ -72,21 +76,9 @@ class MagRankExperiment(Experiment):
         st.write("Y shape: " + str(self.y.shape))
 
         # df.select_dtypes(exclude=["int", "float"]).columns
-        self.X = one_hot_encode(self.X, ["FieldOfStudy_0", "FieldOfStudy_1"])
-
-        st.dataframe(self.X[:5])
-
+        #self.X = one_hot_encode(self.X, ["FieldOfStudy_0", "FieldOfStudy_1"])
         self.X = self.X.assign(Processed_Abstract=preprocess_text_col(self.X["Abstract"]))
-        vectorized_text, vectorizer = vectorize_text(
-            self.X, "Processed_Abstract", 
-            # CountVectorizer(min_df=0.05, max_df=0.8)
-            TfidfVectorizer(min_df=0.01, max_df=0.8)
-        )
-        st.write("Vocabulary size: " + str(vectorized_text.shape[1]))
-        self.X = self.X.drop(columns=["Abstract", "Processed_Abstract"])
-
-        self.X = self.X.join(vectorized_text)
-
+        self.X = self.X.fillna('None')
         st.subheader("After Preprocessing")
         st.write("X shape: " + str(self.X.shape))
         st.write("Y shape: " + str(self.y.shape))
@@ -104,13 +96,42 @@ class MagRankExperiment(Experiment):
         # st.write(self.X_train[:5])
         # st.write(self.y_train[:5])
 
+        self.model_pipeline = Pipeline([
+            ('features', FeatureUnion([
+                ('numeric', Pipeline([
+                    ('selector', select_columns(['CitationCount', 'AuthorProminence']))
+                ])),
+                ('text', Pipeline([
+                    ('selector', select_columns('Processed_Abstract')),
+                    ('tfidf', TfidfVectorizer(min_df=0.01, max_df=0.8))
+                ])),
+                ('categorical', Pipeline([
+                    ('selector', select_columns(['FieldOfStudy_0', 'FieldOfStudy_1'])),
+                    # ('label_encoder', LabelEncoder()),
+                    ('one_hot_encoder', OneHotEncoder(sparse=True, handle_unknown='ignore'))
+                ]))
+            ])),
+            ('clf', ClfSwitcher())
+        ])
+
+        self.pipeline_parameters = [{
+            'features__text__tfidf__max_df': (0.25, 0.5, 0.75, 1.0),
+            'clf__estimator': [GradientBoostingRegressor(random_state=0)],
+            'clf__estimator__max_depth': (1, 4, 10)
+        }, {
+            'features__text__tfidf__max_df': (0.25, 0.5, 0.75, 1.0),
+            'clf__estimator': [Ridge()],
+            'clf__estimator__alpha': (0, 0.1, 1, 10)
+        }]
+
         self.models = [
-            ("Ridge Regression", Ridge(1).fit(self.X_train, self.y_train)),
-            #("Multinomial Naive Bayes", Mult.fit(self.X_train, self.y_train)),
-            ("Linear SVM", LinearSVC(C=0.01, max_iter=80).fit(self.X_train, self.y_train)),
-            ("Random Forest", RandomForestRegressor(max_depth=4, random_state=0).fit(self.X_train, self.y_train)),
-            ("Gradient Boosting", GradientBoostingRegressor(max_depth=4, random_state=0).fit(self.X_train, self.y_train))
+            # ("Ridge Regression", Ridge(1).fit(self.X_train, self.y_train)),
+            # ("Gradient Boosting", GradientBoostingRegressor(max_depth=4, random_state=0).fit(self.X_train, self.y_train))
+            # ("Linear SVM", LinearSVC(C=0.01, max_iter=80).fit(self.X_train, self.y_train)),
+            # ("Random Forest", RandomForestRegressor(max_depth=4, random_state=0).fit(self.X_train, self.y_train)),
         ]
+
+
 
     def evaluate(self):
 
@@ -118,21 +139,36 @@ class MagRankExperiment(Experiment):
         model_prediction_labels = ["Truth"]
         model_predictions = [self.y_test[:count_samples].values]
 
-        for (model_name, model) in self.models:
-            y_pred = model.predict(self.X_test)
-            st.subheader(model_name)
-            print_model_results(y_pred, self.y_test)
+        # for (model_name, model) in self.models:
+        #     y_pred = model.predict(self.X_test)
+        #     st.subheader(model_name)
+        #     print_model_results(y_pred, self.y_test)
 
-            model_prediction_labels.append(model_name)
-            model_predictions.append(y_pred[:count_samples])
+        #     model_prediction_labels.append(model_name)
+        #     model_predictions.append(y_pred[:count_samples])
 
-        st.dataframe(
-            pd.DataFrame(
-                data=np.array(model_predictions).reshape(
-                    count_samples, len(model_predictions)
-                ),
-                columns=model_prediction_labels,
-            )
-        )
+        # st.dataframe(
+        #     pd.DataFrame(
+        #         data=np.array(model_predictions).reshape(
+        #             count_samples, len(model_predictions)
+        #         ),
+        #         columns=model_prediction_labels,
+        #     )
+        # )
+
+        clf = GridSearchCV(self.model_pipeline, self.pipeline_parameters, cv=5, n_jobs=12, return_train_score=False, verbose=3)
+        clf.fit(self.X_train, self.y_train)
+
+        st.write("Best parameters:")
+        st.write(clf.best_params_)
+
+        print("Grid scores on development set:")
+        print()
+        means = clf.cv_results_['mean_test_score']
+        stds = clf.cv_results_['std_test_score']
+        for mean, std, params in zip(means, stds, clf.cv_results_['params']):
+            print("%0.3f (+/-%0.03f) for %r"
+                % (mean, std * 2, params))
+        print()
 
         pass
