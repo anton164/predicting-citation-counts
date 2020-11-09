@@ -2,6 +2,7 @@ import pandas as pd
 import os
 import streamlit as st
 import json
+from datetime import datetime
 
 
 def get_saved_data_location():
@@ -61,16 +62,17 @@ def load_dataset(dataset_filename, limit):
     i = 0
     author_map = {}
     print("Loading dataset")
+    today = datetime.today()
     with open(dataset_filename) as file:
         for json_line in file:
             doc = json.loads(json_line)
             doc["Abstract"] = strip_unprintable(doc["Abstract"])
+            citation_count = int(doc["CitationCount"])
 
             # Extract author id (we don't care about AuthorName and SequenceNumber for now)
             for k, author in enumerate(doc["Authors"]):
                 author_id = author["AuthorId"]
                 doc["Author_" + str(k + 1)] = author_id
-                citation_count = int(doc["CitationCount"])
 
                 if author_id in author_map:
                     author_record = author_map[author_id]
@@ -86,6 +88,13 @@ def load_dataset(dataset_filename, limit):
                     }
 
             del doc["Authors"]
+
+            # Citation Count per Yea
+            published_date = datetime.strptime(doc["PublishedDate"], "%Y-%m-%d")
+            days_since_publication = (today - published_date).days
+            years_since_publication = days_since_publication / 365
+            doc["YearsSincePublication"] = years_since_publication
+            doc["CitationCountPerYear"] = citation_count / years_since_publication
 
             # Map fields of study
             for field_of_study in doc["FieldsOfStudy"]:
