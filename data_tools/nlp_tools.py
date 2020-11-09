@@ -4,6 +4,10 @@ import plotly.express as px
 from .featurizer import add_language_feature
 import spacy
 import numpy as np
+from nltk.tokenize import word_tokenize
+from nltk.corpus import stopwords
+from nltk.corpus import words as englishwords
+from nltk.stem import WordNetLemmatizer
 
 # if this throws and error do: python -m spacy download en_core_web_sm
 nlp = spacy.load("en_core_web_sm")
@@ -49,3 +53,30 @@ def vectorize_text(df, text_col, vectorizer):
     )
 
     return vectorized_df, vectorizer
+
+
+def tokenize(
+    string, lower=True, punctuation=True, stops=True, lemmatize=True, check_english=True
+):
+    """Tokenise a string into a vector"""
+    stop_words = set(stopwords.words("english"))
+    english_words = set(englishwords.words())
+    words = word_tokenize(string)
+    lzr = WordNetLemmatizer()
+
+    # Remove Lower Case
+    if lower:
+        words = [w.lower() for w in words]
+    # Remove Punctuation
+    if punctuation:
+        words = [w for w in words if w.isalnum()]
+    # Remove Stop Words
+    if stops:
+        words = [w for w in words if w not in stop_words]
+    # Lemmatise
+    if lemmatize:
+        words = [lzr.lemmatize(w) for w in words]
+    # Check if word is Enlgish; Takes long to run, use with caution
+    if check_english:
+        words = [w for w in words if w in english_words]
+    return words

@@ -7,6 +7,8 @@ from data_tools import (
     get_saved_data_location,
     add_language_feature,
     add_author_prominence_feature,
+    add_magbin_feature,
+    add_citationbin_feature,
 )
 import os
 
@@ -18,28 +20,20 @@ def data_selection(data):
     doc_type_list = data.DocType.unique().tolist()
     doc_types = get_checkboxes(doc_type_list)
 
-    st.subheader("Part 2a: Independent variable selection")
-    feature_list = [
-        f
-        for f in data.columns.tolist()
-        if f not in ("DocType", "Rank", "CitationCount")
-    ]
+    st.subheader("Part 2a: Feature selection")
+    feature_list = [f for f in data.columns.tolist() if f not in ("DocType")]
     feature_list.sort()
     features = get_checkboxes(feature_list)
 
-    st.subheader("Part 2b: Dependent variable selection")
-    dependent_variable_list = ["Rank", "CitationCount"]
-    dependent_features = get_checkboxes(dependent_variable_list)
-
-    st.subheader("Part 2c: Derived features")
-    derived_features_labels = ["AuthorProminence"]
+    st.subheader("Part 2b: Derived features")
+    derived_features_labels = ["AuthorProminence", "MagBin", "CitationBin"]
     derived_features = get_checkboxes(derived_features_labels)
 
-    st.subheader("Part 2d: Languages to include")
+    st.subheader("Part 2c: Languages to include")
     langauge_labels = ["ENGLISH", "GERMAN", "FRENCH"]
     included_languages = get_checkboxes(langauge_labels)
 
-    return doc_types, features, dependent_features, derived_features, included_languages
+    return doc_types, features, derived_features, included_languages
 
 
 def compile_df(
@@ -47,16 +41,16 @@ def compile_df(
     author_map,
     category_dict,
     features_dict,
-    dependent_feature_dict,
     derived_features,
     included_languages,
     out_file=None,
 ):
-    selected_types = [k for k, v in category_dict.items() if v]
+    selected_types = [str(k) for k, v in category_dict.items() if v]
     selected_features = [k for k, v in features_dict.items() if v]
-    selected_dependent_features = [k for k, v in dependent_feature_dict.items() if v]
     derived_features = [k for k, v in derived_features.items() if v]
     included_languages = [k for k, v in included_languages.items() if v]
+
+    print(selected_types)
 
     col1, col2 = st.beta_columns(2)
     col1.write("Selected Document Types:")
@@ -65,24 +59,28 @@ def compile_df(
     col2.write(", ".join(selected_features))
     col1.write("Derived Features (X):")
     col2.write(", ".join(derived_features))
-    col1.write("Selected Target Values (y):")
-    col2.write(", ".join(selected_dependent_features))
 
     data_with_language = add_language_feature(data)
     data = data[data_with_language["Language"].isin(included_languages)]
 
     df = data.copy()
 
+    # Add derived features
     if "AuthorProminence" in derived_features:
-        df = add_author_prominence_feature(data, author_map)
+        df = add_author_prominence_feature(df, author_map)
+    if "MagBin" in derived_features:
+        df = add_magbin_feature(df)
+    if "CitationBin" in derived_features:
+        df = add_citationbin_feature(df)
 
     for k, v in category_dict.items():
         if not v:
-            df.drop(df[df.DocType == k].index, inplace=True)
+            if k:
+                df.drop(df[df.DocType == k].index, inplace=True)
+            else:
+                df.drop(df[df.DocType.isna()].index, inplace=True)
 
-    df = separate_datasets(
-        df, selected_features + derived_features, y_columns=selected_dependent_features
-    )[0]
+    df = separate_datasets(df, selected_features + derived_features, y_columns=None)[0]
 
     st.subheader("Compiled dataframe shape")
     st.write(df.shape)
