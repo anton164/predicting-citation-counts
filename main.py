@@ -46,6 +46,7 @@ def feature_selection_page():
         features,
         derived_features,
         included_languages,
+        years_since_publication_limit,
     ) = feature_selection.data_selection(raw_docs)
 
     st.subheader("Part 3: Compile Dataset")
@@ -64,6 +65,7 @@ def feature_selection_page():
                 features,
                 derived_features,
                 included_languages,
+                years_since_publication_limit,
                 out_file=filename,
             )
             st.write("Successfully saved dataframe to " + filename)
@@ -75,6 +77,7 @@ def feature_selection_page():
                 features,
                 derived_features,
                 included_languages,
+                years_since_publication_limit,
             )
 
 
