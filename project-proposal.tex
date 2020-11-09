@@ -1,0 +1,55 @@
+\documentclass[12pt]{extarticle}
+\usepackage[utf8]{inputenc}
+\usepackage{cite}
+
+\title{Ranking Academic Abstracts with Features from Microsoft’s Academic Graph}
+\author{Anton Abilov (aa2776), Jan Bernhard (jhb353), Eli Roussos (ekr43)}
+\date{Project Category: Application of machine learning to a practical problem or a dataset}
+
+\begin{document}
+
+\maketitle
+
+\section*{Motivation}
+
+Searching for academic papers can be an arduous process, requiring people to scour journal databases carefully for relevant content. Features such as the magrank of a paper may provide evidence of an impactful paper, but ultimately the correlation between a paper’s success and characteristics is not well understood. Evaluative bibliometrics used for ranking papers, journals and researchers in search engines such as Google Scholar have been recognized as an issue for the academic field, since it can incentivize chasing of metrics instead of pursuing genuinely innovative research\cite{GoogleScholar}. In this project, we aim to explore what characteristics are common to highly cited and meritorious papers, and if such features could yield predictive power. 
+
+\vspace{5mm}
+
+To address this objective, we investigate the following hypotheses:
+
+\begin{enumerate}
+  \item Based on a paper’s metadata, it is possible to fit a model to predict the paper’s importance.
+  \item We can predict how meritorious a paper is likely to be using features from text and language analysis.
+  \item There is a correlation between metadata and abstract text features. Given arbitrary abstract features, we can predict which metadata features would likely result in the paper being ranked highly.
+  \item Citation count, magrank, and publisher are features that are commonly used by academics to identify “good” papers. We expect such features to be highly relevant in predicting which papers are likely to be meritorious.
+\end{enumerate}
+
+\section*{Method}
+
+\subsection*{Data}
+The subject of our investigation is a dataset of five million academic papers extracted from the Microsoft Academic Graph. The dataset provides information common to a complete BibTeX entry as well as additional information about the paper’s importance, citation count, and field of study. To prepare our data, we will featurize the data into two datasets:
+\begin{enumerate}
+  \item A dataset containing the metadata including paper title, but excluding importance rank, citation count, and abstract.
+  \item A bag-of-word dataset containing the paper’s title, abstract, field of study, but excluding all other metadata. 
+\end{enumerate}
+
+\subsection*{Procedure}
+To validate the hypotheses stated above, we plan to conduct the following experiments:
+
+\begin{enumerate}
+  \item Prepare the dataset, conducting any necessary data normalization and noise removal.
+  \item Extract relevant features, including any novel features added in post-processing.
+  \item Train a discriminative model on the Academic Graph metadata. 
+  \item Train a generative model on the abstract textual features.
+  \item Train separate models for different fields-of-study.
+\end{enumerate}
+
+\section*{Future Work}
+Given that we're able to validate our hypotheses, we believe that our work could have useful practical applications such as allowing a researcher to evaluate the quality of their work before publication, or enabling researchers to learn about the most notorious topics and journals within their field. We intend to build an interactive application that uses the resulting models to make suggestions or provide alternative resources on bodies of academic writing.
+
+
+\bibliographystyle{plain}
+\bibliography{M335}
+
+\end{document}
