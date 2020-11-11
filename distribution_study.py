@@ -1,18 +1,12 @@
 import streamlit as st
 import plotly.express as px
-from data_tools import add_language_feature
+from data_tools import (
+    add_language_feature,
+    load_dataset,
+    st_dataset_selector,
+    filter_by_field_of_study,
+)
 import numpy as np
-
-
-def filter_by_field_of_study(df):
-    field_of_study = st.selectbox(
-        "Filter papers by field of study",
-        ["All"] + list(df["FieldOfStudy_0"].unique()),
-    )
-    if field_of_study == "All":
-        return df
-    else:
-        return df.loc[df["FieldOfStudy_0"] == field_of_study]
 
 
 def group_by_column(df, col):
@@ -73,3 +67,14 @@ def run_distribution_study(raw_docs):
     show_distribution(df, "Language")
     show_distribution(df, "Publisher")
     show_distribution(df, "JournalName")
+
+
+def distribution_study_page():
+    docs_limit = st.number_input(
+        "Max limit of docs to parse (more than 10000 items will be slow)",
+        value=1000,
+        step=50,
+    )
+    selected_dataset = st_dataset_selector()
+    raw_docs, author_map = load_dataset(selected_dataset, docs_limit)
+    run_distribution_study(raw_docs)
