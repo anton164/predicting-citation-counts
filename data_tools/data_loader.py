@@ -135,3 +135,16 @@ def load_dataset(dataset_filename, limit):
     loading_bar.empty()
 
     return df, author_map
+
+
+def filter_by_field_of_study(df, default_val="All"):
+    options = ["All"] + list(df["FieldOfStudy_0"].unique())
+    field_of_study = st.selectbox(
+        "Filter papers by field of study",
+        options,
+        options.index(default_val)
+    )
+    if field_of_study == "All":
+        return df
+    else:
+        return df.loc[df["FieldOfStudy_0"] == field_of_study]
