@@ -9,9 +9,9 @@ def time_it(label, fn):
     fn: the function to wrap
     """
 
-    def wrapper(*args):
+    def wrapper(*args, **kwargs):
         start_time = time.perf_counter()
-        result = fn(*args)
+        result = fn(*args, **kwargs)
         end_time = time.perf_counter()
         label_str = str(label(result)) if callable(label) else str(label)
 

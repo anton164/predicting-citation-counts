@@ -35,7 +35,7 @@ def feature_selection_page():
     )
     selected_dataset = st_dataset_selector()
 
-    raw_docs, author_map = load_dataset(selected_dataset, docs_limit)
+    raw_docs, author_map = load_dataset(selected_dataset, docs_limit, use_predefined_filters=True)
 
     ##############
     # Extracts available data columns and creates checkboxes
