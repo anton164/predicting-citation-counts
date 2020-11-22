@@ -22,7 +22,7 @@ def paper_exploration_page():
     )
     selected_dataset = st_dataset_selector()
 
-    raw_docs, author_map = load_dataset(selected_dataset, docs_limit)
+    raw_docs, author_map = load_dataset(selected_dataset, docs_limit, use_predefined_filters=True)
 
     # raw_docs = filter_by_field_of_study(raw_docs, "computer science")
 
