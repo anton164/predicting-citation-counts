@@ -12,5 +12,6 @@ COPY experiments ./experiments
 COPY correlation_study.py ./correlation_study.py
 COPY distribution_study.py ./distribution_study.py
 COPY vectorize_text_study.py ./vectorize_text_study.py
+COPY paper_exploration.py ./paper_exploration.py
 COPY sample_data.jsonl ./sample_data.jsonl
 CMD streamlit run app.py --server.port 80

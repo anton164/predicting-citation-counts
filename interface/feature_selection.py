@@ -38,12 +38,17 @@ def data_selection(data):
         "Include papers published in the last N years"
     )
 
+    field_of_study_list = ["All"] + data["FieldOfStudy_0"].unique().tolist()
+    st.subheader("Part 2e: Filter by Field of Study")
+    selected_field_of_study = st.selectbox("Field of Study", field_of_study_list)
+
     return (
         doc_types,
         features,
         derived_features,
         included_languages,
         years_since_publication_limit,
+        selected_field_of_study,
     )
 
 
@@ -55,14 +60,13 @@ def compile_df(
     derived_features,
     included_languages,
     years_since_publication_limit,
+    selected_field_of_study,
     out_file=None,
 ):
     selected_types = [str(k) for k, v in category_dict.items() if v]
     selected_features = [k for k, v in features_dict.items() if v]
     derived_features = [k for k, v in derived_features.items() if v]
     included_languages = [k for k, v in included_languages.items() if v]
-
-    print(selected_types)
 
     col1, col2 = st.beta_columns(2)
     col1.write("Selected Document Types:")
@@ -74,6 +78,9 @@ def compile_df(
 
     data_with_language = add_language_feature(data)
     data = data[data_with_language["Language"].isin(included_languages)]
+
+    if selected_field_of_study != "All":
+        data = data[data["FieldOfStudy_0"] == selected_field_of_study]
 
     if years_since_publication_limit:
         data = data[data["YearsSincePublication"] < years_since_publication_limit]

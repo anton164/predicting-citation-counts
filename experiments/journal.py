@@ -77,7 +77,12 @@ class JournalExperiment(Experiment):
         self.X = self.X.fillna("None")
         self.X = self.X.drop(columns="Abstract")
         encoded_words = pd.get_dummies(self.X.Processed_Abstract, dummy_na=True)
-        self.X = pd.merge(self.X.drop(columns="Processed_Abstract"), encoded_words, left_index=True, right_index=True)
+        self.X = pd.merge(
+            self.X.drop(columns="Processed_Abstract"),
+            encoded_words,
+            left_index=True,
+            right_index=True,
+        )
 
         st.subheader("After Preprocessing")
         st.write("X shape: " + str(self.X.shape))
