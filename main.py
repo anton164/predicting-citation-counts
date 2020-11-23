@@ -1,18 +1,13 @@
-from math import exp
-from numpy.core.numeric import outer
 import time
-import pandas as pd
 import streamlit as st
 from interface import (
     components,
     feature_selection,
 )
-import experiments
 from data_tools import (
     st_dataset_selector,
     load_dataset,
     time_it,
-    one_hot_encode_authors,
 )
 
 # Wrap methods with timer:
