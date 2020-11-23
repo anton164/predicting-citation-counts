@@ -1,8 +1,7 @@
 # Streamlit
 import streamlit as st
 from .base import Experiment
-from data_tools import add_language_feature, add_author_prominence_feature
-from distribution_study import show_distribution
+from data_tools import preprocess_text_col
 
 # Models
 from sklearn.linear_model import LogisticRegression
@@ -41,31 +40,46 @@ class JournalExperiment(Experiment):
 
         # Take AuthorProminence, CitationCount, FieldOfStudy and encode
         categorials = pandas_df[
-            ["AuthorProminence", "CitationCount", "FieldOfStudy_1", "MagBin"]
+            ["FieldOfStudy_1", "MagBin", "CitationBin", "Publisher"]
         ]
         encoded_categories = pd.get_dummies(categorials, dummy_na=True)
 
         # Add encoded cats back
-        self.X = self.X.drop(
+        self.X = pandas_df.drop(
             columns=[
-                [
-                    "AuthorProminence",
-                    "CitationCount",
-                    "FieldOfStudy_1",
-                    "Journal",
-                    "MagBin",
-                    "Rank",
-                ]
+                "CitationCount",
+                "FieldOfStudy_0",
+                "FieldOfStudy_1",
+                "JournalName",
+                "FirstPage",
+                "LastPage",
+                "Publisher",
+                "MagBin",
+                "Rank",
+                "CitationBin",
+                "YearsSincePublication",
             ]
         )
         self.X = pd.merge(self.X, encoded_categories, left_index=True, right_index=True)
 
         # Set target
-        self.y = pandas_df["Journal"]
+        self.y = pandas_df["JournalName"]
         self.model = None
 
     def preprocess(self):
         st.subheader("Preprocessing")
+        st.write("X shape: " + str(self.X.shape))
+        st.write("Y shape: " + str(self.y.shape))
+
+        self.X = self.X.assign(
+            Processed_Abstract=preprocess_text_col(self.X["Abstract"])
+        )
+        self.X = self.X.fillna("None")
+        self.X = self.X.drop(columns="Abstract")
+        encoded_words = pd.get_dummies(self.X.Processed_Abstract, dummy_na=True)
+        self.X = pd.merge(self.X.drop(columns="Processed_Abstract"), encoded_words, left_index=True, right_index=True)
+
+        st.subheader("After Preprocessing")
         st.write("X shape: " + str(self.X.shape))
         st.write("Y shape: " + str(self.y.shape))
 
@@ -85,7 +99,7 @@ class JournalExperiment(Experiment):
         self.models = [
             (
                 "Logistic Regression",
-                LogisticRegression(1).fit(self.X_train, self.y_train),
+                LogisticRegression().fit(self.X_train, self.y_train),
             ),
             (
                 "Linear SVM",

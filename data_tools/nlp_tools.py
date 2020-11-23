@@ -46,9 +46,8 @@ def preprocess_text_col(text_col):
         preproc_pipe.append((" ".join(tokens).lower()))
     return preproc_pipe
 
-@st.cache(
-    allow_output_mutation=True
-)
+
+@st.cache(allow_output_mutation=True)
 def vectorize_text(df, text_col, vectorizer):
     vectorized = vectorizer.fit_transform(df[text_col])
     vectorized_df = pd.DataFrame.sparse.from_spmatrix(

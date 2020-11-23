@@ -34,9 +34,17 @@ def data_selection(data):
     included_languages = get_checkboxes(langauge_labels)
 
     st.subheader("Part 2d: Time range")
-    years_since_publication_limit = st.number_input("Include papers published in the last N years")
+    years_since_publication_limit = st.number_input(
+        "Include papers published in the last N years"
+    )
 
-    return doc_types, features, derived_features, included_languages, years_since_publication_limit
+    return (
+        doc_types,
+        features,
+        derived_features,
+        included_languages,
+        years_since_publication_limit,
+    )
 
 
 def compile_df(
@@ -67,7 +75,7 @@ def compile_df(
     data_with_language = add_language_feature(data)
     data = data[data_with_language["Language"].isin(included_languages)]
 
-    if (years_since_publication_limit):
+    if years_since_publication_limit:
         data = data[data["YearsSincePublication"] < years_since_publication_limit]
 
     df = data.copy()
