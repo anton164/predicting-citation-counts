@@ -1,18 +1,13 @@
-from math import exp
-from numpy.core.numeric import outer
 import time
-import pandas as pd
 import streamlit as st
 from interface import (
     components,
     feature_selection,
 )
-import experiments
 from data_tools import (
     st_dataset_selector,
     load_dataset,
     time_it,
-    one_hot_encode_authors,
 )
 
 # Wrap methods with timer:
@@ -35,7 +30,9 @@ def feature_selection_page():
     )
     selected_dataset = st_dataset_selector()
 
-    raw_docs, author_map = load_dataset(selected_dataset, docs_limit, use_predefined_filters=True)
+    raw_docs, author_map = load_dataset(
+        selected_dataset, docs_limit, use_predefined_filters=True
+    )
 
     ##############
     # Extracts available data columns and creates checkboxes
@@ -47,7 +44,7 @@ def feature_selection_page():
         derived_features,
         included_languages,
         years_since_publication_limit,
-        selected_field_of_study
+        selected_field_of_study,
     ) = feature_selection.data_selection(raw_docs)
 
     st.subheader("Part 3: Compile Dataset")
@@ -80,7 +77,7 @@ def feature_selection_page():
                 derived_features,
                 included_languages,
                 years_since_publication_limit,
-                selected_field_of_study
+                selected_field_of_study,
             )
 
 

@@ -1,6 +1,7 @@
 from sklearn.base import BaseEstimator
 from sklearn.linear_model import LinearRegression
 
+
 class ClfSwitcher(BaseEstimator):
     def __init__(
         self,

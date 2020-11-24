@@ -22,7 +22,9 @@ def paper_exploration_page():
     )
     selected_dataset = st_dataset_selector()
 
-    raw_docs, author_map = load_dataset(selected_dataset, docs_limit, use_predefined_filters=True)
+    raw_docs, author_map = load_dataset(
+        selected_dataset, docs_limit, use_predefined_filters=True
+    )
 
     # raw_docs = filter_by_field_of_study(raw_docs, "computer science")
 
@@ -31,20 +33,22 @@ def paper_exploration_page():
 
     st.subheader("{} authors found".format(len(authors)))
 
-    if (len(authors) > 0):
-        st.dataframe(
-            authors
-        )
+    if len(authors) > 0:
+        st.dataframe(authors)
 
-        if (len(authors) < 5):
+        if len(authors) < 5:
             for index, author in authors.iterrows():
                 print(author)
-                st.markdown("""
+                st.markdown(
+                    """
                     ### {}  
                     **CitationCounts [PaperId: Count]:**   
 
                     {}
-                """.format(author["Name"], author["CitationCounts"]))
+                """.format(
+                        author["Name"], author["CitationCounts"]
+                    )
+                )
 
         paper_id_input = st.text_input("Select paper by id:")
         paper_id = int(paper_id_input) if paper_id_input.isdigit() else None

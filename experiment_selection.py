@@ -2,7 +2,7 @@ def experiment_selection_page():
     import pandas as pd
     import streamlit as st
     from experiments import experiment_map
-    from data_tools import st_saved_dataset_selector, load_dataset
+    from data_tools import st_saved_dataset_selector
 
     #############
     # Select Experiment Type

@@ -54,15 +54,18 @@ def strip_unprintable(s):
 
 
 def is_doc_included_by_predefined_filters(doc):
-    is_comp_sci = "FieldOfStudy_0" in doc and doc["FieldOfStudy_0"] == "computer science"
+    is_comp_sci = (
+        "FieldOfStudy_0" in doc and doc["FieldOfStudy_0"] == "computer science"
+    )
     is_conf_or_journal = doc["DocType"] == "Journal" or doc["DocType"] == "Conference"
 
     return is_comp_sci and is_conf_or_journal
 
+
 # Adding allow_output_mutation significantly speeds up
 # the caching: https://github.com/streamlit/streamlit/issues/898
 @st.cache(suppress_st_warning=True, persist=True, allow_output_mutation=True)
-def load_dataset(dataset_filename, limit, use_predefined_filters = False):
+def load_dataset(dataset_filename, limit, use_predefined_filters=False):
     loading_bar = st.progress(0)
     json_data = []
     i = 0
@@ -80,7 +83,9 @@ def load_dataset(dataset_filename, limit, use_predefined_filters = False):
                 ]
             del doc["FieldsOfStudy"]
 
-            if (use_predefined_filters and not is_doc_included_by_predefined_filters(doc)):
+            if use_predefined_filters and not is_doc_included_by_predefined_filters(
+                doc
+            ):
                 continue
             doc["Abstract"] = strip_unprintable(doc["Abstract"])
             citation_count = int(doc["CitationCount"])
@@ -149,9 +154,7 @@ def load_dataset(dataset_filename, limit, use_predefined_filters = False):
 def filter_by_field_of_study(df, default_val="All"):
     options = ["All"] + list(df["FieldOfStudy_0"].unique())
     field_of_study = st.selectbox(
-        "Filter papers by field of study",
-        options,
-        options.index(default_val)
+        "Filter papers by field of study", options, options.index(default_val)
     )
     if field_of_study == "All":
         return df

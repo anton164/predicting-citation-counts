@@ -13,9 +13,6 @@ def get_page_count(first_page, last_page):
     ]
 
 
-from sklearn.preprocessing import LabelEncoder
-
-
 def encode_categorical(df, cols, le_dic):
     """
     NOTE: Only works for "Small sample (50 rows)" for now
@@ -90,18 +87,47 @@ def add_author_prominence_feature(df, author_map):
 
 
 @st.cache
-def add_magbin_feature(df):
-    label_encoder = LabelEncoder()
-    df["MagBin"] = label_encoder.fit_transform(pd.cut(df.Rank, 4, retbins=True)[0])
+def add_magbin_feature(
+    df,
+    use_quantiles=True,
+    quantiles=None,
+    labels=["low", "below-average", "above-average", "high"],
+):
+    if quantiles:
+        assert len(quantiles) == len(labels)
+    else:
+        quantiles = len(labels)
+
+    labels = labels if labels else False
+
+    if use_quantiles:
+        df["MagBin"] = pd.qcut(df.Rank, quantiles, labels=labels).astype(str)
+    else:
+        df["MagBin"] = pd.cut(df.Rank, quantiles, labels=labels).astype(str)
 
     return df
 
 
 @st.cache
-def add_citationbin_feature(df):
-    label_encoder = LabelEncoder()
-    df["CitationBin"] = label_encoder.fit_transform(
-        pd.cut(df.CitationCount, 4, retbins=True)[0]
-    )
+def add_citationbin_feature(
+    df,
+    use_quantiles=True,
+    quantiles=None,
+    labels=["low", "below-average", "above-average", "high"],
+):
+    if quantiles:
+        assert len(quantiles) == len(labels)
+    else:
+        quantiles = len(labels)
 
+    labels = labels if labels else False
+
+    if use_quantiles:
+        df["CitationBin"] = pd.qcut(df.CitationCount, quantiles, labels=labels).astype(
+            str
+        )
+    else:
+        df["CitationBin"] = pd.cut(df.CitationCount, quantiles, labels=labels).astype(
+            str
+        )
     return df
