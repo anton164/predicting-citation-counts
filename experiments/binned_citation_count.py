@@ -43,7 +43,7 @@ def print_model_results(score):
         #### Model results:
         - Score: {}%
     """.format(
-            score
+            score * 100
         )
     )
 
@@ -103,6 +103,9 @@ class BinnedCitationCountExperiment(Experiment):
                 "JournalName",
                 "Publisher",
                 "PageCount",
+                "AuthorRank",
+                "PublisherRank",
+                "JournalNameRank",
             ]
         ]
         self.y = pandas_df["CitationBin"]
@@ -113,14 +116,14 @@ class BinnedCitationCountExperiment(Experiment):
         st.write("X shape: " + str(self.X.shape))
         st.write("Y shape: " + str(self.y.shape))
 
-        self.X = self.X.assign(
-            Processed_Abstract=preprocess_text_col(self.X["Abstract"])
-        )
-        self.X = self.X.fillna("None")
+        # self.X = self.X.assign(
+        #     Processed_Abstract=preprocess_text_col(self.X["Abstract"])
+        # )
+        # self.X = self.X.fillna("None")
 
-        st.subheader("After Preprocessing")
-        st.write("X shape: " + str(self.X.shape))
-        st.write("Y shape: " + str(self.y.shape))
+        # st.subheader("After Preprocessing")
+        # st.write("X shape: " + str(self.X.shape))
+        # st.write("Y shape: " + str(self.y.shape))
 
     def run(self):
         self.preprocess()
@@ -146,57 +149,63 @@ class BinnedCitationCountExperiment(Experiment):
                                         (
                                             "selector",
                                             select_columns(
-                                                ["AuthorProminence", "PageCount"]
+                                                [
+                                                    "AuthorProminence",
+                                                    "PageCount",
+                                                    "PublisherRank",
+                                                    "JournalNameRank",
+                                                    "AuthorRank",
+                                                ]
                                             ),
                                         )
                                     ]
                                 ),
                             ),
-                            (
-                                "text",
-                                Pipeline(
-                                    [
-                                        (
-                                            "selector",
-                                            select_columns("Processed_Abstract"),
-                                        ),
-                                        (
-                                            "tfidf",
-                                            TfidfVectorizer(
-                                                min_df=0.05,
-                                                max_df=0.7,
-                                                max_features=200,
-                                            ),
-                                        ),
-                                    ]
-                                ),
-                            ),
-                            (
-                                "categorical",
-                                Pipeline(
-                                    [
-                                        (
-                                            "selector",
-                                            select_columns(
-                                                [
-                                                    # 'FieldOfStudy_0',
-                                                    # 'FieldOfStudy_1',
-                                                    "FieldOfStudy_2",
-                                                    "JournalName",
-                                                    "Publisher",
-                                                ]
-                                            ),
-                                        ),
-                                        # ('label_encoder', LabelEncoder()),
-                                        (
-                                            "one_hot_encoder",
-                                            OneHotEncoder(
-                                                sparse=True, handle_unknown="ignore"
-                                            ),
-                                        ),
-                                    ]
-                                ),
-                            ),
+                            # (
+                            #     "text",
+                            #     Pipeline(
+                            #         [
+                            #             (
+                            #                 "selector",
+                            #                 select_columns("Processed_Abstract"),
+                            #             ),
+                            #             (
+                            #                 "tfidf",
+                            #                 TfidfVectorizer(
+                            #                     min_df=0.05,
+                            #                     max_df=0.75,
+                            #                     max_features=500,
+                            #                 ),
+                            #             ),
+                            #         ]
+                            #     ),
+                            # ),
+                            # (
+                            #     "categorical",
+                            #     Pipeline(
+                            #         [
+                            #             (
+                            #                 "selector",
+                            #                 select_columns(
+                            #                     [
+                            #                         # 'FieldOfStudy_0',
+                            #                         # 'FieldOfStudy_1',
+                            #                         # "FieldOfStudy_2",
+                            #                         # "JournalName",
+                            #                         # "Publisher",
+                            #                     ]
+                            #                 ),
+                            #             ),
+                            #             # ('label_encoder', LabelEncoder()),
+                            #             (
+                            #                 "one_hot_encoder",
+                            #                 OneHotEncoder(
+                            #                     sparse=True, handle_unknown="ignore"
+                            #                 ),
+                            #             ),
+                            #         ]
+                            #     ),
+                            # ),
                         ]
                     ),
                 ),
@@ -205,24 +214,24 @@ class BinnedCitationCountExperiment(Experiment):
         )
 
         self.pipeline_parameters = [
-            {
-                "clf__estimator": [MultinomialNB(alpha=2)],
-                "clf__estimator__alpha": (0.5, 1, 1.5, 2, 3, 5),
-                # 'features__text__tfidf__max_df': (0.25, 0.5, 0.7),
-                # 'features__text__tfidf__min_df': (0.01, 0.05, 0.1),
-            },
             # {
-            #     'features__text__tfidf__min_df': (0.01, 0.05, 0.1),
-            #     'features__text__tfidf__max_df': (0.25, 0.5, 0.7),
-            #     'clf__estimator': [XGBClassifier()],
+            #     "clf__estimator": [MultinomialNB(alpha=2)],
+            #     "clf__estimator__alpha": (0.5, 1, 1.5, 2, 3, 5),
+            #     # 'features__text__tfidf__max_df': (0.25, 0.5, 0.7),
+            #     # 'features__text__tfidf__min_df': (0.01, 0.05, 0.1),
             # },
-            # {
+            {
+                # 'features__text__tfidf__min_df': (0.01, 0.05, 0.1),
+                # 'features__text__tfidf__max_df': (0.25, 0.5, 0.7),
+                'clf__estimator': [XGBClassifier(random_state=0)],
+            },
+            {
             #     # 'features__text__tfidf__max_df': (0.25, 0.5),
-            #     "clf__estimator": [
-            #         RandomForestClassifier(random_state=0, n_estimators=50)
-            #     ],
-            #     "clf__estimator__max_depth": (25, 50),
-            # }
+                "clf__estimator": [
+                    RandomForestClassifier(random_state=0, n_estimators=50)
+                ],
+                "clf__estimator__max_depth": (25, 50),
+            }
         ]
 
         model = hyperparameter_tuning(self.model_pipeline, self.pipeline_parameters)
@@ -263,7 +272,10 @@ class BinnedCitationCountExperiment(Experiment):
             )
 
             st.write("**Confusion matrix:**")
-            confusion_matrix_df = pd.DataFrame(confusion_matrix(self.y_test, y_pred), columns=citation_bins)
+            confusion_matrix_df = pd.DataFrame(
+                confusion_matrix(self.y_test, y_pred), columns=citation_bins
+            )
+            confusion_matrix_df.index = citation_bins
             st.dataframe(confusion_matrix_df)
 
             model_prediction_labels.append(model_name)
