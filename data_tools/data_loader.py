@@ -76,6 +76,11 @@ def load_dataset(dataset_filename, limit, use_predefined_filters=False):
         for json_line in file:
             doc = json.loads(json_line)
 
+            # Update progress bar
+            i += 1
+            if i % 50 == 0:
+                loading_bar.progress(i / limit)
+
             # Map fields of study
             for field_of_study in doc["FieldsOfStudy"]:
                 doc["FieldOfStudy_" + str(field_of_study["Level"])] = field_of_study[
@@ -130,11 +135,7 @@ def load_dataset(dataset_filename, limit, use_predefined_filters=False):
             del doc["Volume"]
             del doc["Issue"]
 
-            json_data.append(doc)
-            i += 1
-
-            if i % 50 == 0:
-                loading_bar.progress(i / limit)
+            json_data.append(doc) 
 
             if i >= limit:
                 loading_bar.progress(100)
