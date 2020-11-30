@@ -70,7 +70,7 @@ def baseline_median_model(Y_test):
     return Y_pred_median
 
 
-class MagRankExperiment(Experiment):
+class CitationCountRegressionExperiment(Experiment):
     def __init__(self, pandas_df):
         # Drop non-numeric page features and add PageCount feature
         pandas_df[["FirstPage", "LastPage"]] = pandas_df[
