@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import math
 from .language_tools import detect_language
 from sklearn.preprocessing import LabelEncoder
+import math
 
 
 def get_page_count(first_page, last_page):
@@ -37,7 +38,7 @@ def decode_categorical(df, cols, le_dic):
     return t
 
 
-@st.cache
+@st.cache(allow_output_mutation=True)
 def add_language_feature(df):
     language_column = detect_language(df["Abstract"])
     df_with_language = df.assign(Language=language_column)
@@ -76,7 +77,7 @@ def extract_author_prominence_feature(doc, author_map, prominence_threshold=0):
     return 1 if (author_prominence > prominence_threshold) else 0
 
 
-@st.cache
+@st.cache(allow_output_mutation=True)
 def add_author_prominence_feature(df, author_map):
     author_prominence_column = df.apply(
         lambda doc: extract_author_prominence_feature(doc, author_map, 50), axis=1
@@ -86,7 +87,7 @@ def add_author_prominence_feature(df, author_map):
     return df_with_author_prominence
 
 
-@st.cache
+@st.cache(allow_output_mutation=True)
 def add_magbin_feature(
     df,
     use_quantiles=True,
@@ -108,7 +109,7 @@ def add_magbin_feature(
     return df
 
 
-@st.cache
+@st.cache(allow_output_mutation=True)
 def add_citationbin_feature(
     df,
     use_quantiles=True,
@@ -130,4 +131,44 @@ def add_citationbin_feature(
         df["CitationBin"] = pd.cut(df.CitationCount, quantiles, labels=labels).astype(
             str
         )
+    return df
+
+
+def extract_author_citations(doc, author_map):
+    author_cols = doc.index.str.startswith("Author_")
+    author_ids = doc[author_cols][pd.notnull(doc[author_cols])]
+    if len(author_ids) == 0:
+        return 0
+    author_citations = 0
+    for author_id in author_ids:
+        author_citations += (
+            author_map[author_id]["TotalCitationCount"]
+            - author_map[author_id]["CitationCounts"][doc["PaperId"]]
+        )
+    return author_citations
+
+
+@st.cache(allow_output_mutation=True)
+def add_author_rank_feature(df, author_map):
+    author_citations_column = df.apply(
+        lambda doc: extract_author_citations(doc, author_map), axis=1
+    )
+
+    df = df.assign(AuthorRank=author_citations_column.rank(method="dense"))
+
+    return df
+
+
+@st.cache(allow_output_mutation=True)
+def add_rank_feature(df, col):
+    summed_citations_by_column = df.groupby([col])["CitationCount"].sum()
+    summed_citations_ranked_by_column = df.fillna("None").apply(
+        lambda doc: summed_citations_by_column.loc[doc[col]]
+        if doc[col] != "None"
+        else 0,
+        axis=1,
+    )
+
+    df[col + "Rank"] = summed_citations_ranked_by_column.rank(method="dense")
+
     return df

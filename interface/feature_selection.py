@@ -9,6 +9,8 @@ from data_tools import (
     add_author_prominence_feature,
     add_magbin_feature,
     add_citationbin_feature,
+    add_author_rank_feature,
+    add_rank_feature,
 )
 import os
 
@@ -26,7 +28,14 @@ def data_selection(data):
     features = get_checkboxes(feature_list)
 
     st.subheader("Part 2b: Derived features")
-    derived_features_labels = ["AuthorProminence", "MagBin", "CitationBin"]
+    derived_features_labels = [
+        "AuthorProminence",
+        "MagBin",
+        "CitationBin",
+        "AuthorRank",
+        "JournalNameRank",
+        "PublisherRank",
+    ]
     derived_features = get_checkboxes(derived_features_labels)
 
     st.subheader("Part 2c: Languages to include")
@@ -94,6 +103,12 @@ def compile_df(
         df = add_magbin_feature(df)
     if "CitationBin" in derived_features:
         df = add_citationbin_feature(df)
+    if "AuthorRank" in derived_features:
+        df = add_author_rank_feature(df, author_map)
+    if "JournalNameRank" in derived_features:
+        df = add_rank_feature(df, "JournalName")
+    if "PublisherRank" in derived_features:
+        df = add_rank_feature(df, "Publisher")
 
     for k, v in category_dict.items():
         if not v:
