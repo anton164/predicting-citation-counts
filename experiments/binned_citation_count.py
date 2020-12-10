@@ -31,7 +31,7 @@ def hyperparameter_tuning(pipeline, parameters):
         pipeline, parameters, cv=2, n_jobs=12, return_train_score=False, verbose=3
     )
 
-
+st.set_option('deprecation.showPyplotGlobalUse', False)
 select_columns = lambda features: FunctionTransformer(
     lambda x: x[features], validate=False
 )
@@ -70,7 +70,7 @@ def group_by_column(df, col):
     grouped_by_col["Percentage"] = (
         100 * grouped_by_col["countPapers"] / grouped_by_col["countPapers"].sum()
     )
-    return grouped_by_col.sort_values('Max citation count')
+    return grouped_by_col.sort_values("Max citation count")
 
 
 def show_distribution(df, col, render_limit=10):
@@ -105,7 +105,7 @@ class BinnedCitationCountExperiment(Experiment):
         self.model = None
 
     def preprocess(self, binary_classification=False):
-        if (binary_classification):
+        if binary_classification:
             self.pandas_df["CitationBin"] = self.pandas_df["CitationBin"].replace(
                 {"below-average": "low", "above-average": "high"}
             )
@@ -130,6 +130,18 @@ class BinnedCitationCountExperiment(Experiment):
         st.subheader("After Preprocessing")
         st.write("X shape: " + str(self.X.shape))
         st.write("Y shape: " + str(self.y.shape))
+        st.subheader("JournalNameRank")
+        self.pandas_df["JournalNameRank"].hist(bins=100)
+        st.pyplot()
+        st.subheader("AuthorRank")
+        self.pandas_df["AuthorRank"].hist(bins=100)
+        st.pyplot()
+        st.subheader("PublisherRank")
+        self.pandas_df["PublisherRank"].hist(bins=100)
+        st.pyplot()
+            
+            #self.pandas_df[].hist()
+        #)
 
         show_distribution(self.pandas_df, "CitationBin")
 
@@ -147,7 +159,7 @@ class BinnedCitationCountExperiment(Experiment):
         st.write("X_train shape: " + str(self.X_train.shape))
         st.write("y_train shape: " + str(self.y_train.shape))
 
-        if (st.button('Train model & evaluate')):
+        if st.button("Train model & evaluate"):
             self.model = self.train()
             self.evaluate()
         pass
