@@ -59,7 +59,18 @@ def group_by_column(df, col):
     grouped_by_col["Percentage"] = (
         100 * grouped_by_col["countPapers"] / grouped_by_col["countPapers"].sum()
     )
-    return grouped_by_col
+    min_values = []
+    max_values = []
+    for val in grouped_by_col.index:
+        min_values.append(df[df[col] == val]["CitationCount"].min())
+    for val in grouped_by_col.index:
+        max_values.append(df[df[col] == val]["CitationCount"].max())
+    grouped_by_col["Min citation count"] = min_values
+    grouped_by_col["Max citation count"] = max_values
+    grouped_by_col["Percentage"] = (
+        100 * grouped_by_col["countPapers"] / grouped_by_col["countPapers"].sum()
+    )
+    return grouped_by_col.sort_values('Max citation count')
 
 
 def show_distribution(df, col, render_limit=10):
@@ -91,8 +102,14 @@ class BinnedCitationCountExperiment(Experiment):
         )
 
         self.pandas_df = pandas_df
+        self.model = None
 
-        self.X = pandas_df[
+    def preprocess(self, binary_classification=False):
+        if (binary_classification):
+            self.pandas_df["CitationBin"] = self.pandas_df["CitationBin"].replace(
+                {"below-average": "low", "above-average": "high"}
+            )
+        self.X = self.pandas_df[
             [
                 "Abstract",
                 "FieldOfStudy_0",
@@ -108,30 +125,31 @@ class BinnedCitationCountExperiment(Experiment):
                 "JournalNameRank",
             ]
         ]
-        self.y = pandas_df["CitationBin"]
-        self.model = None
+        self.y = self.pandas_df["CitationBin"]
 
-    def preprocess(self):
-        st.subheader("Before Preprocessing")
+        st.subheader("After Preprocessing")
         st.write("X shape: " + str(self.X.shape))
         st.write("Y shape: " + str(self.y.shape))
 
-        # self.X = self.X.assign(
-        #     Processed_Abstract=preprocess_text_col(self.X["Abstract"])
-        # )
-        # self.X = self.X.fillna("None")
-
-        # st.subheader("After Preprocessing")
-        # st.write("X shape: " + str(self.X.shape))
-        # st.write("Y shape: " + str(self.y.shape))
+        show_distribution(self.pandas_df, "CitationBin")
 
     def run(self):
-        self.preprocess()
+        docs_limit = st.number_input(
+            "Limit dataset size (more than 10000 items will be slow)",
+            value=1000,
+            step=50,
+        )
+        binary_classification = st.checkbox("Convert to binary classification")
+
+        self.pandas_df = self.pandas_df[:docs_limit]
+        self.preprocess(binary_classification)
         self.split(0.15)
         st.write("X_train shape: " + str(self.X_train.shape))
         st.write("y_train shape: " + str(self.y_train.shape))
-        self.model = self.train()
-        self.evaluate()
+
+        if (st.button('Train model & evaluate')):
+            self.model = self.train()
+            self.evaluate()
         pass
 
     # @st.cache
@@ -154,10 +172,36 @@ class BinnedCitationCountExperiment(Experiment):
                                                     "PageCount",
                                                     "PublisherRank",
                                                     "JournalNameRank",
-                                                    "AuthorRank",
+                                                    # "AuthorRank",
                                                 ]
                                             ),
                                         )
+                                    ]
+                                ),
+                            ),
+                            (
+                                "categorical",
+                                Pipeline(
+                                    [
+                                        (
+                                            "selector",
+                                            select_columns(
+                                                [
+                                                    "FieldOfStudy_0",
+                                                    # 'FieldOfStudy_1',
+                                                    # "FieldOfStudy_2",
+                                                    # "JournalName",
+                                                    # "Publisher",
+                                                ]
+                                            ),
+                                        ),
+                                        # ('label_encoder', LabelEncoder()),
+                                        (
+                                            "one_hot_encoder",
+                                            OneHotEncoder(
+                                                sparse=True, handle_unknown="ignore"
+                                            ),
+                                        ),
                                     ]
                                 ),
                             ),
@@ -180,32 +224,6 @@ class BinnedCitationCountExperiment(Experiment):
                             #         ]
                             #     ),
                             # ),
-                            # (
-                            #     "categorical",
-                            #     Pipeline(
-                            #         [
-                            #             (
-                            #                 "selector",
-                            #                 select_columns(
-                            #                     [
-                            #                         # 'FieldOfStudy_0',
-                            #                         # 'FieldOfStudy_1',
-                            #                         # "FieldOfStudy_2",
-                            #                         # "JournalName",
-                            #                         # "Publisher",
-                            #                     ]
-                            #                 ),
-                            #             ),
-                            #             # ('label_encoder', LabelEncoder()),
-                            #             (
-                            #                 "one_hot_encoder",
-                            #                 OneHotEncoder(
-                            #                     sparse=True, handle_unknown="ignore"
-                            #                 ),
-                            #             ),
-                            #         ]
-                            #     ),
-                            # ),
                         ]
                     ),
                 ),
@@ -214,24 +232,24 @@ class BinnedCitationCountExperiment(Experiment):
         )
 
         self.pipeline_parameters = [
-            # {
-            #     "clf__estimator": [MultinomialNB(alpha=2)],
-            #     "clf__estimator__alpha": (0.5, 1, 1.5, 2, 3, 5),
-            #     # 'features__text__tfidf__max_df': (0.25, 0.5, 0.7),
-            #     # 'features__text__tfidf__min_df': (0.01, 0.05, 0.1),
-            # },
+            {
+                "clf__estimator": [MultinomialNB(alpha=2)],
+                "clf__estimator__alpha": (0.5, 1, 1.5, 2, 3, 5),
+                # 'features__text__tfidf__max_df': (0.25, 0.5, 0.7),
+                # 'features__text__tfidf__min_df': (0.01, 0.05, 0.1),
+            },
             {
                 # 'features__text__tfidf__min_df': (0.01, 0.05, 0.1),
                 # 'features__text__tfidf__max_df': (0.25, 0.5, 0.7),
-                'clf__estimator': [XGBClassifier(random_state=0)],
+                "clf__estimator": [XGBClassifier(random_state=0)],
             },
             {
-            #     # 'features__text__tfidf__max_df': (0.25, 0.5),
+                #     # 'features__text__tfidf__max_df': (0.25, 0.5),
                 "clf__estimator": [
                     RandomForestClassifier(random_state=0, n_estimators=50)
                 ],
                 "clf__estimator__max_depth": (25, 50),
-            }
+            },
         ]
 
         model = hyperparameter_tuning(self.model_pipeline, self.pipeline_parameters)
@@ -240,7 +258,6 @@ class BinnedCitationCountExperiment(Experiment):
 
     def evaluate(self):
         citation_bins = np.unique(self.y)
-        show_distribution(self.pandas_df, "CitationBin")
 
         st.subheader("Baseline model (random guesses)")
         print_model_results(1.0 / len(citation_bins))
