@@ -1,7 +1,5 @@
 import pandas as pd
-import streamlit as st
 import plotly.express as px
-from .featurizer import add_language_feature
 import spacy
 import numpy as np
 from nltk.tokenize import word_tokenize
@@ -47,7 +45,6 @@ def preprocess_text_col(text_col):
     return preproc_pipe
 
 
-@st.cache(allow_output_mutation=True)
 def vectorize_text(df, text_col, vectorizer):
     vectorized = vectorizer.fit_transform(df[text_col])
     vectorized_df = pd.DataFrame.sparse.from_spmatrix(
