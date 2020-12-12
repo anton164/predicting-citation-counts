@@ -4,7 +4,7 @@ from sklearn.metrics import confusion_matrix, classification_report
 
 
 def make_uniform(labels: np.array, max_cnt: int) -> np.array:
-    selection = np.zeros_like(labels, dtype=bool)
+    selection = np.zeros(len(labels), dtype=bool)
     classes = np.unique(labels)
     for c in classes:
         cnt = 0
@@ -24,7 +24,7 @@ def print_model(model: object, X: np.array, y_true: np.array) -> None:
     print(classification_report(y_true, y_pred))
 
 
-def get_uniform_version(X: np.array, y: np.array) -> Tuple[np.array]:
+def get_uniform_version(X: np.ndarray, y: np.ndarray) -> Tuple[np.ndarray]:
     classes = np.unique(y)
     classes.sort()
     x = [np.sum(y == c) for c in classes]
