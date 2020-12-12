@@ -38,7 +38,7 @@ def bin_citation(citation_counts, theta):
     bins[bins.size-theta_num-1:] = 0
     return bins, theta_num
 
-bins, theta_num = bin_citation(data.CitationCountPerYear, 0.50)
+bins, theta_num = bin_citation(data.CitationCountPerYear, 0.10)
 data["bin"] = bins
 df_uniform  = data[data.bin >= 0]
 df_bow, vectorizer = vectorize_text(
@@ -63,13 +63,6 @@ bottom10 = np.argsort(diff[vocab_cols])[:10]
 print(low_bow.iloc[:, vocab_cols].columns.tolist())
 print(low_bow.iloc[:, vocab_cols[top10]].columns.tolist())
 print(low_bow.iloc[:, vocab_cols[bottom10]].columns.tolist())
-
-# plt.figure(1)
-# plt.bar(list(range(50)), l[vocab_cols], align="edge", label="Class 0")
-# plt.bar(list(range(50)), h[vocab_cols], align="center", label="Class 1")
-# plt.xticks(vocab)
-# plt.legend()
-# plt.show()
 
 features = vectorizer.transform(data.Processed_Abstract)
 features = pd.DataFrame.sparse.from_spmatrix(
