@@ -84,7 +84,7 @@ class BagOfModels:
 
             # calculate prediction scores
             if y is not None:
-                self.training_scores_[model_name] = self.score_fn(y, y_pred)
+                self.validation_scores_[model_name] = self.score_fn(y, y_pred)
 
         return labels
 
