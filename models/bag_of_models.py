@@ -26,10 +26,9 @@ class BagOfModels:
         self.fit_models_ = {}
         self.training_scores_ = {}
         self.validation_scores_ = {}
-        self.random_state = 0
         self.score_fn = f1_score
 
-    def fit(self, X: np.ndarray, y: np.ndarray, hyperparams: Dict(str, dict)={}) -> None:
+    def fit(self, X: np.ndarray, y: np.ndarray, hyperparams: Dict[str, dict]={}) -> None:
         """
         Initializes model with specified hyperparameters, and
         trains model with provided training data.
@@ -46,19 +45,20 @@ class BagOfModels:
         """
 
         for model_name, model_fn in self.models_.items():
+            print("Fitting model: ", model_name)
             # init model with hyperparameter selection
             params = hyperparams.get(model_name, {})
             model = model_fn(**params)
 
             # train model and save trained model to dict
             self.fit_models_[model_name] = model
-            model.fit(X, y, random_state=self.random_state)
+            model.fit(X, y)
 
             # calculate training scores
             y_pred = model.predict(X)
             self.training_scores_[model_name] = self.score_fn(y, y_pred)
 
-    def predict(self, X: np.ndarray, y: np.ndarray=None) -> np.ndarray:
+    def predict(self, X: np.ndarray, y: np.ndarray=None) -> Dict[str, np.ndarray]:
         """
         Runs prediction on all trained models, and
         collects validation scores when groud truth classes are given.
@@ -82,3 +82,13 @@ class BagOfModels:
         return labels
 
             
+if __name__ == "__main__":
+    bom = BagOfModels()
+    X = np.eye(100, 5, dtype=float)
+    y = np.ones(100, dtype=int)
+    y[:50] = 0
+
+    bom.fit(X, y)
+    print(bom.training_scores_)
+    y_pred = bom.predict(X)
+    print(y_pred)
