@@ -68,7 +68,7 @@ class BagOfModels:
 
             # calculate training scores
             y_pred = model.predict(X)
-            self.training_scores_[model_name] = self.score_fn(y, y_pred)
+            self.training_scores_ = self.score(X, y_pred)
 
     def predict(self, X: np.ndarray) -> Dict[str, np.ndarray]:
         """
