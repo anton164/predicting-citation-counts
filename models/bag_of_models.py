@@ -1,5 +1,7 @@
 from typing import Dict
 import numpy as np
+import json
+import os
 
 
 # 5 types of models
@@ -27,8 +29,9 @@ class BagOfModels:
         self.training_scores_ = {}
         self.validation_scores_ = {}
         self.score_fn = f1_score
+        self.hyperparams = {}
 
-    def fit(self, X: np.ndarray, y: np.ndarray, hyperparams: Dict[str, dict]={}) -> None:
+    def fit(self, X: np.ndarray, y: np.ndarray, hyperparams: Dict[str, dict]=None) -> None:
         """
         Initializes model with specified hyperparameters, and
         trains model with provided training data.
@@ -43,6 +46,10 @@ class BagOfModels:
         Returns:
             None
         """
+        if hyperparams is None:
+            hyperparams = self.hyperparams
+        else:
+            self.hyperparams = hyperparams
 
         for model_name, model_fn in self.models_.items():
             print("Fitting model: ", model_name)
@@ -81,14 +88,54 @@ class BagOfModels:
 
         return labels
 
+    def load_hyperparams(self, filepath: str) -> None:
+        """
+        Loads JSON file with hyperparameter options for models.
+
+        Args:
+            filepath: string - Path to hyperparameter JSON file. 
+
+        Returns:
+            None
+        """
+        with open(filepath, 'r') as file:
+            self.hyperparams = json.load(file)
+
+    def dump_hyperparams(self, filepath: str) -> None:
+        """
+        Writes JSON file with hyperparameter options for models.
+
+        Args:
+            filepath: string - Path to hyperparameter JSON file. 
+            
+        Returns:
+            None
+        """
+        with open(filepath, 'w') as file:
+            json.dump(self.hyperparams, file, sort_keys=True, indent=4)
+
             
 if __name__ == "__main__":
     bom = BagOfModels()
+
+    hyperparams = {
+        'SVC': {
+            'kernel': 'linear'
+        },
+        'NeuralNetwork': {
+            'early_stopping': True
+        }
+    }
     X = np.eye(100, 5, dtype=float)
     y = np.ones(100, dtype=int)
     y[:50] = 0
 
-    bom.fit(X, y)
+    bom.fit(X, y, hyperparams=hyperparams)
     print(bom.training_scores_)
-    y_pred = bom.predict(X)
+
+    bom.dump_hyperparams("./test.json")
+    bom.load_hyperparams("./test.json")
+
+    y_pred = bom.predict(X, y)
     print(y_pred)
+    print(bom.validation_scores_)
