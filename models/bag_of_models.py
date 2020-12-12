@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Any, Dict
 import numpy as np
 import json
 import os
@@ -115,6 +115,28 @@ class BagOfModels:
         with open(filepath, "w") as file:
             json.dump(self.hyperparams, file, sort_keys=True, indent=4)
 
+    def get_best_estimator(self) -> Any:
+        """
+        Returns estimator that achieved the highest prediction score.
+
+        Args:
+            None
+
+        Returns:
+            Estimator instance
+        """
+        best_score = -np.infty
+        best_model = None
+        for model_name, _ in self.fit_models_.items():
+            score = self.validation_scores_.get(model_name, -1.0)
+            if score > best_score:
+                best_score = score
+                best_model = model_name
+        
+        if best_score < 0.0:
+            print("WARNING: No validation scores available. \n \t -> Run BagOfModels.predict(X, y) first.")
+        
+        return self.fit_models_[best_model]
 
 if __name__ == "__main__":
     bom = BagOfModels()
