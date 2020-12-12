@@ -26,7 +26,6 @@ class BagOfModels:
         }
         self.fit_models_ = {}
         self.training_scores_ = {}
-        self.validation_scores_ = {}
         self.score_fn = f1_score
         self.hyperparams = {}
 
@@ -53,9 +52,14 @@ class BagOfModels:
             self.hyperparams = hyperparams
 
         for model_name, model_fn in self.models_.items():
-            print("Fitting model: ", model_name)
             # init model with hyperparameter selection
             params = hyperparams.get(model_name, {})
+
+            # option to skip a selected model
+            if params is False:
+                continue
+            print("Fitting model: ", model_name)
+
             model = model_fn(**params)
 
             # train model and save trained model to dict
@@ -64,12 +68,11 @@ class BagOfModels:
 
             # calculate training scores
             y_pred = model.predict(X)
-            self.training_scores_[model_name] = self.score_fn(y, y_pred)
+            self.training_scores_ = self.score(X, y_pred)
 
-    def predict(self, X: np.ndarray, y: np.ndarray = None) -> Dict[str, np.ndarray]:
+    def predict(self, X: np.ndarray) -> Dict[str, np.ndarray]:
         """
-        Runs prediction on all trained models, and
-        collects validation scores when groud truth classes are given.
+        Runs prediction on all trained models.
 
         Args:
             X: np.ndarray - Feature data
@@ -83,11 +86,25 @@ class BagOfModels:
             y_pred = model.predict(X)
             labels[model_name] = y_pred
 
-            # calculate prediction scores
-            if y is not None:
-                self.validation_scores_[model_name] = self.score_fn(y, y_pred)
-
         return labels
+
+    def score(self, X: np.ndarray, y: np.ndarray) -> Dict[str, float]:
+        """
+        Returns prediction scores for all trained models.
+
+        Args:
+            X: np.ndarray - Feature data
+            y: np.ndarray - Ground truth classes
+
+        Returns:
+            Dict[str, float]: Scores of each model
+        """
+        scores = {}
+        for model_name, model in self.fit_models_.items():
+            y_pred = model.predict(X)
+            scores[model_name] = self.score_fn(y, y_pred)
+
+        return scores
 
     def load_hyperparams(self, filepath: str) -> None:
         """
