@@ -53,9 +53,14 @@ class BagOfModels:
             self.hyperparams = hyperparams
 
         for model_name, model_fn in self.models_.items():
-            print("Fitting model: ", model_name)
             # init model with hyperparameter selection
             params = hyperparams.get(model_name, {})
+
+            # option to skip a selected model
+            if params is False:
+                continue
+            print("Fitting model: ", model_name)
+
             model = model_fn(**params)
 
             # train model and save trained model to dict
