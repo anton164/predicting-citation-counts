@@ -5,7 +5,7 @@ import os
 
 
 # 5 types of models
-from sklearn.svm import SVC 
+from sklearn.svm import SVC
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.neural_network import MLPClassifier
@@ -16,14 +16,13 @@ from sklearn.metrics import f1_score
 
 
 class BagOfModels:
-
     def __init__(self) -> None:
         self.models_ = {
-            'LinearSVC': SVC,
-            'NaiveBayes': MultinomialNB,
-            'RandomForest': RandomForestClassifier,
-            'NeuralNetwork': MLPClassifier,
-            'XGBoost': XGBClassifier
+            "LinearSVC": SVC,
+            "NaiveBayes": MultinomialNB,
+            "RandomForest": RandomForestClassifier,
+            "NeuralNetwork": MLPClassifier,
+            "XGBoost": XGBClassifier,
         }
         self.fit_models_ = {}
         self.training_scores_ = {}
@@ -31,7 +30,9 @@ class BagOfModels:
         self.score_fn = f1_score
         self.hyperparams = {}
 
-    def fit(self, X: np.ndarray, y: np.ndarray, hyperparams: Dict[str, dict]=None) -> None:
+    def fit(
+        self, X: np.ndarray, y: np.ndarray, hyperparams: Dict[str, dict] = None
+    ) -> None:
         """
         Initializes model with specified hyperparameters, and
         trains model with provided training data.
@@ -65,7 +66,7 @@ class BagOfModels:
             y_pred = model.predict(X)
             self.training_scores_[model_name] = self.score_fn(y, y_pred)
 
-    def predict(self, X: np.ndarray, y: np.ndarray=None) -> Dict[str, np.ndarray]:
+    def predict(self, X: np.ndarray, y: np.ndarray = None) -> Dict[str, np.ndarray]:
         """
         Runs prediction on all trained models, and
         collects validation scores when groud truth classes are given.
@@ -93,12 +94,12 @@ class BagOfModels:
         Loads JSON file with hyperparameter options for models.
 
         Args:
-            filepath: string - Path to hyperparameter JSON file. 
+            filepath: string - Path to hyperparameter JSON file.
 
         Returns:
             None
         """
-        with open(filepath, 'r') as file:
+        with open(filepath, "r") as file:
             self.hyperparams = json.load(file)
 
     def dump_hyperparams(self, filepath: str) -> None:
@@ -106,25 +107,21 @@ class BagOfModels:
         Writes JSON file with hyperparameter options for models.
 
         Args:
-            filepath: string - Path to hyperparameter JSON file. 
-            
+            filepath: string - Path to hyperparameter JSON file.
+
         Returns:
             None
         """
-        with open(filepath, 'w') as file:
+        with open(filepath, "w") as file:
             json.dump(self.hyperparams, file, sort_keys=True, indent=4)
 
-            
+
 if __name__ == "__main__":
     bom = BagOfModels()
 
     hyperparams = {
-        'SVC': {
-            'kernel': 'linear'
-        },
-        'NeuralNetwork': {
-            'early_stopping': True
-        }
+        "SVC": {"kernel": "linear"},
+        "NeuralNetwork": {"early_stopping": True},
     }
     X = np.eye(100, 5, dtype=float)
     y = np.ones(100, dtype=int)
