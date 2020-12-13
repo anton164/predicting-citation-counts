@@ -135,7 +135,7 @@ def load_dataset(dataset_filename, limit, use_predefined_filters=False):
             del doc["Volume"]
             del doc["Issue"]
 
-            json_data.append(doc) 
+            json_data.append(doc)
 
             if i >= limit:
                 loading_bar.progress(100)

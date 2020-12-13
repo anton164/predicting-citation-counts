@@ -149,11 +149,14 @@ class BagOfModels:
             if score > best_score:
                 best_score = score
                 best_model = model_name
-        
+
         if best_score < 0.0:
-            print("WARNING: No validation scores available. \n \t -> Run BagOfModels.predict(X, y) first.")
-        
+            print(
+                "WARNING: No validation scores available. \n \t -> Run BagOfModels.predict(X, y) first."
+            )
+
         return self.fit_models_[best_model]
+
 
 if __name__ == "__main__":
     bom = BagOfModels()

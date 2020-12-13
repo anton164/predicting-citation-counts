@@ -31,7 +31,8 @@ def hyperparameter_tuning(pipeline, parameters):
         pipeline, parameters, cv=2, n_jobs=12, return_train_score=False, verbose=3
     )
 
-st.set_option('deprecation.showPyplotGlobalUse', False)
+
+st.set_option("deprecation.showPyplotGlobalUse", False)
 select_columns = lambda features: FunctionTransformer(
     lambda x: x[features], validate=False
 )
@@ -139,9 +140,9 @@ class BinnedCitationCountExperiment(Experiment):
         st.subheader("PublisherRank")
         self.pandas_df["PublisherRank"].hist(bins=100)
         st.pyplot()
-            
-            #self.pandas_df[].hist()
-        #)
+
+        # self.pandas_df[].hist()
+        # )
 
         show_distribution(self.pandas_df, "CitationBin")
 

@@ -1,0 +1,205 @@
+{
+    "Threshold_1": {
+        "test": [
+            {
+                "LinearSVC": 0.18379446640316208,
+                "NaiveBayes": 0.14473684210526314,
+                "NeuralNetwork": 0.18309859154929578,
+                "RandomForest": 0.18483674598782512,
+                "XGBoost": 0.18570683359415754
+            }
+        ],
+        "train": [
+            {
+                "LinearSVC": 0.929903536977492,
+                "NaiveBayes": 0.45172044290987023,
+                "NeuralNetwork": 0.8734561652156306,
+                "RandomForest": 0.9260928346101848,
+                "XGBoost": 1.0
+            }
+        ],
+        "val": [
+            {
+                "LinearSVC": 0.45261669024045265,
+                "NaiveBayes": 0.6112600536193029,
+                "NeuralNetwork": 0.48767123287671227,
+                "RandomForest": 0.44608567208271793,
+                "XGBoost": 0.44832605531295483
+            }
+        ]
+    },
+    "Threshold_10": {
+        "test": [
+            {
+                "LinearSVC": 0.1949238578680203,
+                "NaiveBayes": 0.157701447396846,
+                "NeuralNetwork": 0.19958246346555322,
+                "RandomForest": 0.19956140350877194,
+                "XGBoost": 0.19917012448132781
+            }
+        ],
+        "train": [
+            {
+                "LinearSVC": 0.8641655886157825,
+                "NaiveBayes": 0.5299285463277498,
+                "NeuralNetwork": 0.8939918213274615,
+                "RandomForest": 0.8272863568215891,
+                "XGBoost": 1.0
+            }
+        ],
+        "val": [
+            {
+                "LinearSVC": 0.574468085106383,
+                "NaiveBayes": 0.5725725725725725,
+                "NeuralNetwork": 0.5414507772020726,
+                "RandomForest": 0.5558312655086849,
+                "XGBoost": 0.5202614379084967
+            }
+        ]
+    },
+    "Threshold_2": {
+        "test": [
+            {
+                "LinearSVC": 0.17142857142857143,
+                "NaiveBayes": 0.1509218779699677,
+                "NeuralNetwork": 0.1739460691226738,
+                "RandomForest": 0.1733203505355404,
+                "XGBoost": 0.1779197080291971
+            }
+        ],
+        "train": [
+            {
+                "LinearSVC": 0.9186413902053712,
+                "NaiveBayes": 0.4537037037037037,
+                "NeuralNetwork": 0.850655021834061,
+                "RandomForest": 0.8748230535894843,
+                "XGBoost": 1.0
+            }
+        ],
+        "val": [
+            {
+                "LinearSVC": 0.453757225433526,
+                "NaiveBayes": 0.5962399283795882,
+                "NeuralNetwork": 0.5105263157894736,
+                "RandomForest": 0.4493392070484582,
+                "XGBoost": 0.46088193456614507
+            }
+        ]
+    },
+    "Threshold_20": {
+        "test": [
+            {
+                "LinearSVC": 0.17511147142278072,
+                "NaiveBayes": 0.16367112810707457,
+                "NeuralNetwork": 0.18371040723981902,
+                "RandomForest": 0.17065097462302317,
+                "XGBoost": 0.17965091528309918
+            }
+        ],
+        "train": [
+            {
+                "LinearSVC": 0.91266516274573,
+                "NaiveBayes": 0.710710399502565,
+                "NeuralNetwork": 0.8759612169842862,
+                "RandomForest": 0.8328840970350405,
+                "XGBoost": 1.0
+            }
+        ],
+        "val": [
+            {
+                "LinearSVC": 0.5248756218905473,
+                "NaiveBayes": 0.5279805352798053,
+                "NeuralNetwork": 0.5078947368421053,
+                "RandomForest": 0.5744431418522861,
+                "XGBoost": 0.5185185185185185
+            }
+        ]
+    },
+    "Threshold_40": {
+        "test": [
+            {
+                "LinearSVC": 0.18484539585457016,
+                "NaiveBayes": 0.1311340206185567,
+                "NeuralNetwork": 0.19309742245522063,
+                "RandomForest": 0.18397412863816026,
+                "XGBoost": 0.18194348725017231
+            }
+        ],
+        "train": [
+            {
+                "LinearSVC": 0.940086993124737,
+                "NaiveBayes": 0.5569070373588184,
+                "NeuralNetwork": 0.8248869483860908,
+                "RandomForest": 0.941964922287181,
+                "XGBoost": 1.0
+            }
+        ],
+        "val": [
+            {
+                "LinearSVC": 0.6007067137809187,
+                "NaiveBayes": 0.5827814569536424,
+                "NeuralNetwork": 0.5251989389920425,
+                "RandomForest": 0.5896805896805897,
+                "XGBoost": 0.5887961859356377
+            }
+        ]
+    },
+    "Threshold_5": {
+        "test": [
+            {
+                "LinearSVC": 0.18790849673202614,
+                "NaiveBayes": 0.14747589336358483,
+                "NeuralNetwork": 0.19249887031179394,
+                "RandomForest": 0.18600000000000003,
+                "XGBoost": 0.18706221672847137
+            }
+        ],
+        "train": [
+            {
+                "LinearSVC": 0.9373789541639769,
+                "NaiveBayes": 0.5064671298770711,
+                "NeuralNetwork": 0.8842105263157896,
+                "RandomForest": 0.8531073446327683,
+                "XGBoost": 1.0
+            }
+        ],
+        "val": [
+            {
+                "LinearSVC": 0.5172413793103448,
+                "NaiveBayes": 0.6162162162162163,
+                "NeuralNetwork": 0.4901408450704226,
+                "RandomForest": 0.4615384615384615,
+                "XGBoost": 0.5167336010709503
+            }
+        ]
+    },
+    "Threshold_50": {
+        "test": [
+            {
+                "LinearSVC": 0.16508352440222732,
+                "NaiveBayes": 0.13240857503152584,
+                "NeuralNetwork": 0.18554116172168825,
+                "RandomForest": 0.1608187134502924,
+                "XGBoost": 0.16197183098591547
+            }
+        ],
+        "train": [
+            {
+                "LinearSVC": 0.9224232456140351,
+                "NaiveBayes": 0.5431111111111111,
+                "NeuralNetwork": 0.8196969696969697,
+                "RandomForest": 0.9255800792303338,
+                "XGBoost": 1.0
+            }
+        ],
+        "val": [
+            {
+                "LinearSVC": 0.5539906103286384,
+                "NaiveBayes": 0.5874524714828897,
+                "NeuralNetwork": 0.5099601593625498,
+                "RandomForest": 0.551980198019802,
+                "XGBoost": 0.5567765567765568
+            }
+        ]
+    }
+}

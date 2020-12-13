@@ -13,34 +13,24 @@ import df_utils
 # model evaluation
 from sklearn.metrics import confusion_matrix, classification_report
 
-FEATURE_DATA = ["../saved/metadata_features.csv"]
+thresholds = [1, 2, 5, 10, 20, 40, 50]
+FEATURE_DATA = dict(zip(thresholds, [f"saved/bow_50words_{t}_min_df_5.csv" for t in thresholds]))
 
-TARGET_DATA = [
-    "../saved/binned_citations_threshold_0.csv",
-    "../saved/binned_citations_threshold_1.csv",
-    "../saved/binned_citations_threshold_2.csv",
-    "../saved/binned_citations_threshold_3.csv",
-]
+TARGET_DATA = "saved/binned_citations_threshold_2.csv"
 
-features_cols = [
-    "JournalNameRankNormalized",
-    "PublisherRankNormalized",
-    "NumberOfAuthors",
-    "AuthorRank",
-    "PageCount",
-    "PublicationMonth_1",
-    "PublicationMonth_2",
-    "PublicationMonth_3",
-    "PublicationMonth_4",
-    "PublicationMonth_5",
-    "PublicationMonth_6",
-    "PublicationMonth_7",
-    "PublicationMonth_8",
-    "PublicationMonth_9",
-    "PublicationMonth_10",
-    "PublicationMonth_11",
-    "PublicationMonth_12",
-]
+# features_cols = [
+#     "extensive",
+#     "overview",
+#     "we",
+#     "rich",
+#     "survey",
+#     "availability",
+#     "according",
+#     "empirical",
+#     "firstly",
+#     "so",
+#     "http",
+# ]
 
 
 def run_trial(bom, features, targets, cv=5):
@@ -75,13 +65,14 @@ bom = BagOfModels()
 bom.hyperparams = hyperparams
 
 results = {}
-for i, target_path in enumerate(TARGET_DATA):
-    features = df_utils.load_df(FEATURE_DATA[0]).loc[:, features_cols].values
-    target = df_utils.load_df(target_path).values.ravel()
+for thrsh, feature_path in FEATURE_DATA.items():
+    # features = df_utils.load_df(feature_path)[features_cols].values
+    features = df_utils.load_df(feature_path).values
+    target = df_utils.load_df(TARGET_DATA).values.ravel()
     t_scores, v_scores, test_scores = run_trial(bom, features, target, cv=1)
     print(v_scores)
     print(test_scores)
-    results[f"Threshold_{i}"] = {
+    results[f"Threshold_{thrsh}"] = {
         "train": t_scores,
         "val": v_scores,
         "test": test_scores,

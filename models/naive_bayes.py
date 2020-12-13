@@ -63,9 +63,7 @@ title = r"Learning Curves (MLP Classifier)"
 # SVC is more expensive so we do a lower number of CV iterations:
 cv = ShuffleSplit(n_splits=10, test_size=0.15, random_state=RAND_STATE)
 estimator = Pipeline(steps=[("ss", ss), ("nb", nb)])
-fig = plot_learning_curve(
-    estimator, title, X, y, cv=cv, n_jobs=-1
-)
+fig = plot_learning_curve(estimator, title, X, y, cv=cv, n_jobs=-1)
 plt.show()
 
 
