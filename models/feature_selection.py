@@ -18,8 +18,8 @@ from sklearn.metrics import confusion_matrix, classification_report
 
 N_SPLITS = 4
 RAND_STATE = 42
-metadata_features = df_utils.load_df("./saved/final_datasets/metadata_features.csv")
-target = df_utils.load_df("./saved/final_datasets/binned_citations_threshold_2.csv")
+metadata_features = df_utils.load_df("./saved/metadata_features.csv")
+target = df_utils.load_df("./saved/binned_citations_threshold_2.csv")
 
 bow_features = [
     df_utils.load_df("./saved/final_datasets/bow_50words_1.csv"),
@@ -144,30 +144,45 @@ def drop_one_feature_selection(features):
 
 
 print("All features:")
-features = bow_features2[3]
+features = metadata_features
 print(list(features.columns))
 
 if False:
     results = drop_one_feature_selection(features)
-    with open("./drop_one_feature_selection_results.json", "w") as file:
+    with open("./drop_one_feature_selection_results-2.json", "w") as file:
         json.dump(results, file, sort_keys=True, indent=4)
 
 else:
     X = features.iloc[:].values
     y = target.iloc[:].values.ravel()
-    for estimator in [RandomForestClassifier(**hyperparams["RandomForest"]), XGBClassifier(**hyperparams["XGBoost"])]:
-        print(estimator)
+
+    classifiers = {
+        "RandomForest": RandomForestClassifier(**hyperparams["RandomForest"]),
+        "XGBClassifier": XGBClassifier(**hyperparams["XGBoost"]) 
+    }
+
+    all_features = list(features.columns)
+    results = {
+        "all_features": all_features
+    }
+
+    for clf_name, classifier in classifiers.items():
+        print("Running RFECV with {}".format(clf_name))
     
         feature_selector = RFECV(
-            estimator=estimator,
+            estimator=classifier,
             step=1,
-            cv=ShuffleSplit(n_splits=N_SPLITS, test_size=0.10, random_state=0),
+            cv=ShuffleSplit(n_splits=3, test_size=0.10, random_state=0),
         )
 
         feature_selector.fit(X, y)
+        ranked_features = list(zip(feature_selector.ranking_.tolist(), all_features))
+        sorted_ranked_features = sorted(ranked_features, key=lambda x: x[0])
+        results[clf_name] = {
+            "ranked_features": sorted_ranked_features,
+            "relevant_features": list(features.columns[feature_selector.support_]),
+            "grid_scores": feature_selector.grid_scores_.tolist()
+        }
 
-        print(list(features.columns))
-        print(feature_selector.ranking_)
-
-        print("Relevant features:")
-        print(list(features.columns[feature_selector.support_]))
+    with open("./rfecv_metadata_results.json", "w") as file:
+        json.dump(results, file, sort_keys=True, indent=4)
