@@ -1,8 +1,5 @@
 # aml-research-project
 
-GCP deployment address for the main branch:
-http://35.209.145.171
-
 Please refer to the [project report](project_report.pdf).
 
 ## Set-up (Python 3.7+)
